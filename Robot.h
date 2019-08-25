@@ -48,6 +48,7 @@ signals:
 public slots:
     void advance(int step) override;
 private:
+    void AddGoalToCompleted(Waypoint*);
     void UpdatePosition(Velocity _vel); 
     State GetRobotState();
     void IncreaseLinearVelocity();
@@ -74,6 +75,7 @@ private:
     qreal mouseEyeDirection;
 
     std::queue<Waypoint*> goals_;
+    std::queue<Waypoint*> goalsCompleted_;
     std::queue<QGraphicsRectItem*> trailPoints_;
 };
 

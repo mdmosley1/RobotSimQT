@@ -105,6 +105,17 @@ void Robot::Brake()
 //         Brake();            
 // }
 
+void Robot::AddGoalToCompleted(Waypoint* _goal)
+{
+    goalsCompleted_.push(_goal);
+    while (goalsCompleted_.size() > 5)
+    {
+        auto goal = goalsCompleted_.front();
+        goalsCompleted_.pop();
+        scene()->removeItem(goal);
+    }
+}
+
 Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
 {
     double kp = 20;
@@ -122,12 +133,12 @@ Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
     {
         // change color of the waypoint
         _goal->SetColor(Qt::green);
-        goals_.pop();
+        AddGoalToCompleted(_goal);
 
+        goals_.pop();
         if (goals_.empty())
             return Velocity(0,0);
     }
-    
 
     if (alpha > M_PI)
         alpha -= 2 * M_PI;
