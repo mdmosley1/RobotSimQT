@@ -195,6 +195,11 @@ void Robot::advance(int step)
     }
 }
 
+void Robot::GetMeasurement()
+{
+    std::cout << "A sensor measurment was made!" << "\n";
+}
+
 
 void Robot::AddWaypoint(Waypoint* _waypt)
 {
@@ -210,6 +215,11 @@ void Robot::UpdatePosition(Velocity _vel)
     double yn = y() + dt*std::sin(theta_)*_vel.linear;
     theta_ += dt*_vel.angular;
 
+    if (theta_ > M_PI)
+        theta_ -= 2*M_PI;
+    if (theta_ < -M_PI)
+        theta_ += 2*M_PI;
+
     // std::cout << "Rotation = " << rotation() << "\n";
     // std::cout << "PositionX = " << x() << "\n";
     // std::cout << "PositionY= " << y() << "\n";
@@ -218,3 +228,44 @@ void Robot::UpdatePosition(Velocity _vel)
     emit PositionChanged(xn, yn);
     emit UpdateVelocity(_vel.linear);
 }
+
+// the python measuremnent code for april tags
+/*
+def get_measurements(self):
+        """
+        Returns a list of lists of visible landmarks and a fresh boolean that
+        checks if it the measurement is ready
+        Outputs:
+        measurements - a N by 5 list of visible tags or None. The tags are in
+            the form in the form (x,y,theta,id,time) with x,y being the 2D
+            position of the marker relative to the robot, theta being the
+            relative orientation of the marker with respect to the robot, id
+            being the identifier from the map, and time being the current time
+            stamp. If no tags are seen, the function returns None.
+        """
+        curr_time = self.__frame_num*self.__dt
+        if curr_time - self.last_meas_time < self.__MEAS_RATE or len(self.markers_flipped) == 0:
+            return None
+        self.last_meas_time = curr_time
+        self.__visible_markers = [False for i in range(len(self.markers_flipped))]
+
+        H_WR = self.__H(self.__x_gt)
+        # Get measurements to the robot frame
+        meas = []
+
+        for i in range(len(self.markers_flipped)):
+            H_WT = self.__H(self.markers[i])
+            H_RT = np.linalg.solve(H_WR,H_WT)
+            x_new = H_RT[0:2,2]
+            theta_new = math.atan2(H_RT[1,0], H_RT[0,0])
+            marker_view_angle = \
+                np.absolute(np.arccos(x_new[0]/(math.sqrt(x_new[0]**2 + x_new[1]**2))))
+            if abs(marker_view_angle) < self.__view_half_angle and abs(theta_new) < np.pi/3 and x_new[0] < 2:
+                self.__visible_markers[i] = True
+                meas_i = np.array([x_new[0],x_new[1], theta_new, self.markers_flipped[i][3], self.last_meas_time])
+                meas_i[0:3] = meas_i[0:3] + np.array([np.random.normal(0, self.__image_noise)])
+                meas.append(meas_i.tolist())
+        if not meas:
+            meas = None
+        return meas
+*/

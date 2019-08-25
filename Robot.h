@@ -47,6 +47,7 @@ signals:
     void PositionChanged(double xn, double yn);
     void UpdateVelocity(double);
 public slots:
+    void GetMeasurement();
     void advance(int step) override;
 private:
     void AddGoalToCompleted(Waypoint*);

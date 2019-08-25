@@ -22,7 +22,14 @@ const double Y_BOUND_MAX = 1000;
 
 CustomView::CustomView(Robot* _robot): robot_(_robot)
 {
+    
 }
+
+void CustomView::keyPressEvent(QKeyEvent *event)
+{
+    std::cout << "keypress!" << "\n";
+}
+
 
 void CustomView::mousePressEvent(QMouseEvent *event)
 {

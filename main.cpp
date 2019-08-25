@@ -11,6 +11,7 @@
 
 #include "mainwindow.h"
 
+
 static const int MouseCount = 7;
 
 const double X_BOUND_MIN = 0;
@@ -38,8 +39,9 @@ int main(int argc, char **argv)
     for (int i = 0; i < MouseCount; ++i)
     {
         Mouse *mouse = new Mouse;
-        mouse->setPos(::sin((i * 6.28) / MouseCount) * 200,
-                      ::cos((i * 6.28) / MouseCount) * 200);
+        mouse->setPos(std::rand() % int(X_BOUND_MAX),
+                      std::rand() % int(Y_BOUND_MAX));
+        std::cout << "Mouse at position = " << mouse->pos().x()<< "\n";
         scene.addItem(mouse);
     }
 
@@ -61,69 +63,17 @@ int main(int argc, char **argv)
     QObject::connect(&timer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
     timer.start(1/LOOP_RATE*1000);
 
+    // TODO create another timer here that represents the rate at
+    // which the sensor measurement is made. when timer expires, call Robot::GetMeasurement like this:
+    //QTimer timerSensor;
+     // QObject::connect(&timerSensor, &QTimer::timeout,
+     //                  robot, &Robot::GetMeasurment);     
+//     timerSensor.start(1000); // once per second
+
     std::cout << "starting program" << "\n";
 
     MainWindow w(robot);
     w.show();
     
     return app.exec();
-}    
-
-    // test out the custom plot
-    // QMainWindow window;
-// // setup customPlot as central widget of window:
-//     QCustomPlot customPlot;
-//     window.setCentralWidget(&customPlot);
-  
-// // create plot (from quadratic plot example):
-//     QVector<double> x(101), y(101);
-//     for (int i=0; i<101; ++i)
-//     {
-//         x[i] = i/50.0 - 1;
-//         y[i] = x[i]*x[i];
-//     }
-//     customPlot.addGraph();
-//     customPlot.graph(0)->setData(x, y);
-//     customPlot.xAxis->setLabel("x");
-//     customPlot.yAxis->setLabel("y");
-//     customPlot.rescaleAxes();
-  
-//     window.setGeometry(100, 100, 500, 400);
-//     window.show();
-
-
-   
-
-
-// int main(int argc, char **argv)
-// {
-//     QApplication app(argc, argv);
-
-//     QMainWindow window;
-  
-// // setup customPlot as central widget of window:
-//     QCustomPlot customPlot;
-//     window.setCentralWidget(&customPlot);
-  
-// // create plot (from quadratic plot example):
-//     QVector<double> x(101), y(101);
-//     for (int i=0; i<101; ++i)
-//     {
-//         x[i] = i/50.0 - 1;
-//         y[i] = x[i]*x[i];
-//     }
-//     customPlot.addGraph();
-//     customPlot.graph(0)->setData(x, y);
-//     customPlot.xAxis->setLabel("x");
-//     customPlot.yAxis->setLabel("y");
-//     customPlot.rescaleAxes();
-  
-//     window.setGeometry(100, 100, 500, 400);
-//     window.show();
-
-//     std::cout << "starting program" << "\n";
-
-//     return app.exec();
-// }
-
-
+} 

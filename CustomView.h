@@ -13,9 +13,10 @@ class CustomView: public QGraphicsView
 {
 public:
     CustomView(Robot* _robot);
-    Robot * robot_;
     void mousePressEvent(QMouseEvent* event) override;
-    
+    void keyPressEvent(QKeyEvent* event) override;
+
+    Robot * robot_;
 
 public slots:
         void realtimeDataSlot();

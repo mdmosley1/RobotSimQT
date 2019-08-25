@@ -62,7 +62,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Plots of position (left) and linear velocity (right)", 0));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Plots of position (top) and linear velocity (bottom)", 0));
     } // retranslateUi
 
 };

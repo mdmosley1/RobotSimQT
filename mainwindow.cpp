@@ -17,6 +17,12 @@ MainWindow::MainWindow(Robot* _robotPtr, QWidget *parent) :
   
   setupPosPlot(ui->customPlotPos, _robotPtr);
   setupVelPlot(ui->customPlotVel, _robotPtr);
+
+
+  
+  connect(&dataTimer, SIGNAL(timeout()),
+          _robotPtr, SLOT(GetMeasurement()));
+  dataTimer.start(1000); // once per second
 }
 
 MainWindow::~MainWindow()
@@ -46,7 +52,7 @@ void MainWindow::setupPosPlot(QCustomPlot *customPlotPos, Robot* _robotPtr)
   //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
   connect(_robotPtr, SIGNAL(PositionChanged(double, double)),
           this,      SLOT(PlotPosition(double, double)));
-  dataTimer.start(0); // Interval 0 means to refresh as fast as possible
+  //dataTimer.start(0); // Interval 0 means to refresh as fast as possible
 }
 
 void MainWindow::setupVelPlot(QCustomPlot *customPlotVel, Robot* _robotPtr)
@@ -69,7 +75,7 @@ void MainWindow::setupVelPlot(QCustomPlot *customPlotVel, Robot* _robotPtr)
   //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
   connect(_robotPtr, SIGNAL(UpdateVelocity(double)),
           this,      SLOT(PlotVelocity(double)));
-  dataTimer.start(0); // Interval 0 means to refresh as fast as possible
+  //dataTimer.start(0); // Interval 0 means to refresh as fast as possible
 }
 
 
