@@ -181,6 +181,7 @@ void Robot::advance(int step)
         auto point = trailPoints_.front();
         trailPoints_.pop();
         scene()->removeItem(point);
+        delete point;
     }
 }
 
