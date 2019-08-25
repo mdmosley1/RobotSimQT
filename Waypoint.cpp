@@ -13,19 +13,12 @@ QRectF Waypoint::boundingRect() const
                   36 + adjust, 60 + adjust);
 }
 
-QPainterPath Waypoint::shape() const
-{
-    QPainterPath path;
-    path.addRect(-10, -20, 20, 40);
-    return path;
-}
-
 void Waypoint::paint(QPainter *painter,
                      const QStyleOptionGraphicsItem *option,
                      QWidget *widget)
 {    
     painter->setBrush(color_);
-    painter->drawEllipse(-10, -20, 20, 40);
+    painter->drawEllipse(-10, -10, 10, 10);
 }
 
 void Waypoint::SetColor(QColor _color)

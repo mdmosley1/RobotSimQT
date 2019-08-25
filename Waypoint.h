@@ -9,7 +9,6 @@ class Waypoint : public QGraphicsItem
 public:
     Waypoint(int, int);
     QRectF boundingRect() const override;
-    QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
     void SetColor(QColor _color);
