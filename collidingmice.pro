@@ -3,12 +3,14 @@ QT += widgets
 HEADERS += \
 	mouse.h \
         Robot.h \
-        CustomView.h
+        CustomView.h/
+        Waypoint.h
 SOURCES += \
 	main.cpp \
         mouse.cpp \
         Robot.cpp \
-        CustomView.cpp
+        CustomView.cpp\
+        Waypoint.cpp
 
 RESOURCES += \
 	mice.qrc

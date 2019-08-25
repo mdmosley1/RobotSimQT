@@ -5,6 +5,7 @@
 #include <math.h>
 #include "mouse.h"
 #include "Robot.h"
+#include "Waypoint.h"
 
 
 static const int MouseCount = 7;
@@ -20,16 +21,21 @@ CustomView::CustomView(QGraphicsScene* scene)
     setScene(scene);
 
     robot = new Robot();
-    robot->setPos(0,0);
-    robot->SetGoal(X_BOUND_MAX/2, Y_BOUND_MAX/2);
     scene->addItem(robot);
+    robot->setPos(0,0);
+
+    Waypoint* waypoint = new Waypoint(X_BOUND_MAX/2, Y_BOUND_MAX/2);
+    robot->AddWaypoint(waypoint);
 }
 
 void CustomView::mousePressEvent(QMouseEvent *event)
 {
-    std::cout << "Game Mouse event triggerd at " << event->x() << ", " << event->y() << "\n";
-    robot->AddWaypoint(event->x(),event->y());
-
+    int x = event->x();
+    int y = event->y();
+    std::cout << "Mouse event triggerd at " << x << ", " << y << "\n";
+    
+    Waypoint* nextWaypoint = new Waypoint(x,y);
+    robot->AddWaypoint(nextWaypoint);
     QGraphicsView::mousePressEvent(event);
 }
 

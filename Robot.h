@@ -5,6 +5,7 @@
 //#include <QObject>
 #include <QGraphicsItem>
 #include <queue>
+#include "Waypoint.h"
 //#include <QMediaPlayer>
 //#include <QMouseEvent>
 
@@ -36,7 +37,8 @@ public:
     Robot();
     void SetGoal(double x, double y);
     void SetGoal(Point2f);
-    void AddWaypoint(double x, double y);
+    //void AddWaypoint(double x, double y);
+    void AddWaypoint(Waypoint*);
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

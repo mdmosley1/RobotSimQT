@@ -5,6 +5,7 @@
 #include <iostream>
 #include "qpainter.h"
 #include "constants.hh"
+#include "Waypoint.h"
 
 
 Robot::Robot(): mouseEyeDirection(0), color(std::rand() % 256, std::rand() % 256, std::rand() % 256)
@@ -116,8 +117,8 @@ Velocity Robot::GenerateRobotControl(State _state, Point2f _goal)
     double rho = std::sqrt(deltaX*deltaX + deltaY*deltaY); // distance btwne goal and state
     double alpha = -_state.theta + std::atan2(deltaY, deltaX); // How much robot needs to turn in order to face waypoint
 
-    // if we are close to current waypoint, then retrieve the next waypoint if there is one
-    if (rho < 5)
+    // if we collide with current waypoint, then retrieve the next waypoint if there is one
+    if (rho < 15)
     {
         if (goals_.empty())
             return Velocity(0,0);
@@ -128,8 +129,6 @@ Velocity Robot::GenerateRobotControl(State _state, Point2f _goal)
             goals_.pop();
         }
     }
-    
-    
     
 
     if (alpha > M_PI)
@@ -169,18 +168,21 @@ void Robot::advance(int step)
     UpdatePosition(velocity);
 
     // create an item to put into the scene so i can see where the position is represented
-    // QGraphicsRectItem* rect = new QGraphicsRectItem();
-    // rect->setRect(x(), y(), 2, 2);
-    // rect->setBrush(Qt::green);
+    QGraphicsRectItem* trailPoint = new QGraphicsRectItem();
+    QPointF point = mapToScene(0, 30);
+    std::cout << "point = " << point.x() << ", " << point.y() << "\n";
+    trailPoint->setRect(point.x(), point.y(), 2, 2);
+    trailPoint->setBrush(Qt::green);
     //add the item to the scene
-    //scene()->addItem(rect);
+    scene()->addItem(trailPoint);
 }
 
 
-void Robot::AddWaypoint(double x, double y)
+void Robot::AddWaypoint(Waypoint* _waypt)
 {
-    std::cout << "Adding waypoint at " << x << ", " << y << "\n";
-    goals_.push(Point2f(x,y));
+    std::cout << "Adding waypoint at " << _waypt->x() << ", " << _waypt->y() << "\n";    
+    goals_.push(Point2f(_waypt->x(),_waypt->y()));
+    scene()->addItem(_waypt);
 }
 
 void Robot::SetGoal(Point2f _goal)
