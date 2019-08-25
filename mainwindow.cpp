@@ -15,7 +15,8 @@ MainWindow::MainWindow(Robot* _robotPtr, QWidget *parent) :
   ui->setupUi(this);
   setGeometry(400, 250, 542, 390);
   
-  setupRealtimeDataDemo(ui->customPlot, _robotPtr);
+  setupPosPlot(ui->customPlotPos, _robotPtr);
+  setupVelPlot(ui->customPlotVel, _robotPtr);
 }
 
 MainWindow::~MainWindow()
@@ -23,44 +24,57 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setupRealtimeDataDemo(QCustomPlot *customPlot, Robot* _robotPtr)
+void MainWindow::setupPosPlot(QCustomPlot *customPlotPos, Robot* _robotPtr)
 {
   demoName = "Real Time Data Demo";
-  
-  // include this section to fully disable antialiasing for higher performance:
-  /*
-  customPlot->setNotAntialiasedElements(QCP::aeAll);
-  QFont font;
-  font.setStyleStrategy(QFont::NoAntialias);
-  customPlot->xAxis->setTickLabelFont(font);
-  customPlot->yAxis->setTickLabelFont(font);
-  customPlot->legend->setFont(font);
-  */
-  customPlot->addGraph(); // blue line
-  customPlot->graph(0)->setPen(QPen(QColor(40, 110, 255)));
-  customPlot->addGraph(); // red line
-  customPlot->graph(1)->setPen(QPen(QColor(255, 110, 40)));
+  customPlotPos->addGraph(); // blue line
+  customPlotPos->graph(0)->setPen(QPen(QColor(40, 110, 255)));
+  customPlotPos->addGraph(); // red line
+  customPlotPos->graph(1)->setPen(QPen(QColor(255, 110, 40)));
 
   QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
   timeTicker->setTimeFormat("%h:%m:%s");
-  customPlot->xAxis->setTicker(timeTicker);
-  customPlot->axisRect()->setupFullAxesBox();
-  customPlot->yAxis->setRange(0, 1000);
+  customPlotPos->xAxis->setTicker(timeTicker);
+  customPlotPos->axisRect()->setupFullAxesBox();
+  customPlotPos->yAxis->setRange(0, 1000);
   
   // make left and bottom axes transfer their ranges to right and top axes:
-  connect(customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->xAxis2, SLOT(setRange(QCPRange)));
-  connect(customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->yAxis2, SLOT(setRange(QCPRange)));
+  connect(customPlotPos->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlotPos->xAxis2, SLOT(setRange(QCPRange)));
+  connect(customPlotPos->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlotPos->yAxis2, SLOT(setRange(QCPRange)));
   
   // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
   //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
   connect(_robotPtr, SIGNAL(PositionChanged(double, double)),
-          this,      SLOT(realtimeDataSlot(double, double)));
+          this,      SLOT(PlotPosition(double, double)));
+  dataTimer.start(0); // Interval 0 means to refresh as fast as possible
+}
+
+void MainWindow::setupVelPlot(QCustomPlot *customPlotVel, Robot* _robotPtr)
+{
+  demoName = "Real Time Data Demo";
+  customPlotVel->addGraph(); // blue line
+  customPlotVel->graph(0)->setPen(QPen(QColor(40, 110, 255)));
+
+  QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
+  timeTicker->setTimeFormat("%h:%m:%s");
+  customPlotVel->xAxis->setTicker(timeTicker);
+  customPlotVel->axisRect()->setupFullAxesBox();
+  customPlotVel->yAxis->setRange(0, 1000);
+  
+  // make left and bottom axes transfer their ranges to right and top axes:
+  connect(customPlotVel->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlotVel->xAxis2, SLOT(setRange(QCPRange)));
+  connect(customPlotVel->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlotVel->yAxis2, SLOT(setRange(QCPRange)));
+  
+  // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
+  //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
+  connect(_robotPtr, SIGNAL(UpdateVelocity(double)),
+          this,      SLOT(PlotVelocity(double)));
   dataTimer.start(0); // Interval 0 means to refresh as fast as possible
 }
 
 
 
-void MainWindow::realtimeDataSlot(double _x, double _y)
+void MainWindow::PlotPosition(double _x, double _y)
 {
   static QTime time(QTime::currentTime());
   // calculate two new data points:
@@ -69,16 +83,16 @@ void MainWindow::realtimeDataSlot(double _x, double _y)
   if (key-lastPointKey > 0.002) // at most add point every 2 ms
   {
     // add data to lines:
-    ui->customPlot->graph(0)->addData(key, _x);
-    ui->customPlot->graph(1)->addData(key, _y);
+    ui->customPlotPos->graph(0)->addData(key, _x);
+    ui->customPlotPos->graph(1)->addData(key, _y);
     // rescale value (vertical) axis to fit the current data:
-    //ui->customPlot->graph(0)->rescaleValueAxis();
-    //ui->customPlot->graph(1)->rescaleValueAxis(true);
+    ui->customPlotPos->graph(0)->rescaleValueAxis();
+    ui->customPlotPos->graph(1)->rescaleValueAxis(true);
     lastPointKey = key;
   }
   // make key axis range scroll with the data (at a constant range size of 8):
-  ui->customPlot->xAxis->setRange(key, 8, Qt::AlignRight);
-  ui->customPlot->replot();
+  ui->customPlotPos->xAxis->setRange(key, 8, Qt::AlignRight);
+  ui->customPlotPos->replot();
   
   // calculate frames per second:
   static double lastFpsKey;
@@ -89,46 +103,44 @@ void MainWindow::realtimeDataSlot(double _x, double _y)
     ui->statusBar->showMessage(
           QString("%1 FPS, Total Data points: %2")
           .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
-          .arg(ui->customPlot->graph(0)->data()->size()+ui->customPlot->graph(1)->data()->size())
+          .arg(ui->customPlotPos->graph(0)->data()->size()
+               +ui->customPlotPos->graph(1)->data()->size())
           , 0);
     lastFpsKey = key;
     frameCount = 0;
   }
 }
 
-// void MainWindow::realtimeDataSlot()
-// {
-//   static QTime time(QTime::currentTime());
-//   // calculate two new data points:
-//   double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
-//   static double lastPointKey = 0;
-//   if (key-lastPointKey > 0.002) // at most add point every 2 ms
-//   {
-//     // add data to lines:
-//     ui->customPlot->graph(0)->addData(key, qSin(key)+qrand()/(double)RAND_MAX*1*qSin(key/0.3843));
-//     ui->customPlot->graph(1)->addData(key, qCos(key)+qrand()/(double)RAND_MAX*0.5*qSin(key/0.4364));
-//     // rescale value (vertical) axis to fit the current data:
-//     //ui->customPlot->graph(0)->rescaleValueAxis();
-//     //ui->customPlot->graph(1)->rescaleValueAxis(true);
-//     lastPointKey = key;
-//   }
-//   // make key axis range scroll with the data (at a constant range size of 8):
-//   ui->customPlot->xAxis->setRange(key, 8, Qt::AlignRight);
-//   ui->customPlot->replot();
+void MainWindow::PlotVelocity(double _velocity)
+{
+  static QTime time(QTime::currentTime());
+  // calculate two new data points:
+  double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+  static double lastPointKey = 0;
+  if (key-lastPointKey > 0.002) // at most add point every 2 ms
+  {
+    // add data to lines:
+    ui->customPlotVel->graph(0)->addData(key, _velocity);
+    // rescale value (vertical) axis to fit the current data:
+    ui->customPlotVel->graph(0)->rescaleValueAxis();
+    lastPointKey = key;
+  }
+  // make key axis range scroll with the data (at a constant range size of 8):
+  ui->customPlotVel->xAxis->setRange(key, 8, Qt::AlignRight);
+  ui->customPlotVel->replot();
   
-//   // calculate frames per second:
-//   static double lastFpsKey;
-//   static int frameCount;
-//   ++frameCount;
-//   if (key-lastFpsKey > 2) // average fps over 2 seconds
-//   {
-//     ui->statusBar->showMessage(
-//           QString("%1 FPS, Total Data points: %2")
-//           .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
-//           .arg(ui->customPlot->graph(0)->data()->size()+ui->customPlot->graph(1)->data()->size())
-//           , 0);
-//     lastFpsKey = key;
-//     frameCount = 0;
-//   }
-// }
-
+  // calculate frames per second:
+  static double lastFpsKey;
+  static int frameCount;
+  ++frameCount;
+  if (key-lastFpsKey > 2) // average fps over 2 seconds
+  {
+    ui->statusBar->showMessage(
+          QString("%1 FPS, Total Data points: %2")
+          .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
+          .arg(ui->customPlotVel->graph(0)->data()->size())
+          , 0);
+    lastFpsKey = key;
+    frameCount = 0;
+  }
+}

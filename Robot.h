@@ -45,6 +45,7 @@ public:
                QWidget *widget) override;
 signals:
     void PositionChanged(double xn, double yn);
+    void UpdateVelocity(double);
 public slots:
     void advance(int step) override;
 private:

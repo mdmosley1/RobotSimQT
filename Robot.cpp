@@ -216,4 +216,5 @@ void Robot::UpdatePosition(Velocity _vel)
     setPos(xn, yn);
     setRotation(theta_*180/M_PI + 90);
     emit PositionChanged(xn, yn);
+    emit UpdateVelocity(_vel.linear);
 }

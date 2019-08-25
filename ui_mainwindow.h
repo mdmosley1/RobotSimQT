@@ -27,7 +27,8 @@ class Ui_MainWindow
 public:
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout;
-    QCustomPlot *customPlot;
+    QCustomPlot *customPlotPos;
+    QCustomPlot *customPlotVel;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -41,10 +42,13 @@ public:
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        customPlot = new QCustomPlot(centralWidget);
-        customPlot->setObjectName(QStringLiteral("customPlot"));
+        customPlotPos = new QCustomPlot(centralWidget);
+        customPlotVel = new QCustomPlot(centralWidget);
+        customPlotPos->setObjectName(QStringLiteral("customPlotPos"));
+        customPlotVel->setObjectName(QStringLiteral("customPlotVel"));
 
-        verticalLayout->addWidget(customPlot);
+        verticalLayout->addWidget(customPlotPos);
+        verticalLayout->addWidget(customPlotVel);
 
         MainWindow->setCentralWidget(centralWidget);
         statusBar = new QStatusBar(MainWindow);
@@ -58,7 +62,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "QCustomPlot plot examples", 0));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Plots of position (left) and linear velocity (right)", 0));
     } // retranslateUi
 
 };
