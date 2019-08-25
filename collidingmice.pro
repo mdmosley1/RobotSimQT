@@ -14,8 +14,6 @@ SOURCES += \
         Waypoint.cpp\
         mainwindow.cpp
 
-RESOURCES += \
-	mice.qrc
 
 QT += core
 # install
