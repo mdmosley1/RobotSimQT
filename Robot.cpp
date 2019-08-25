@@ -105,29 +105,27 @@ void Robot::Brake()
 //         Brake();            
 // }
 
-Velocity Robot::GenerateRobotControl(State _state, Point2f _goal)
+Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
 {
     double kp = 20;
     double ka = 5;
     double kb = 0;
 
-    double deltaX = _goal.x - _state.x;
-    double deltaY = _goal.y - _state.y;
+    double deltaX = _goal->x() - _state.x;
+    double deltaY = _goal->y() - _state.y;
 
     double rho = std::sqrt(deltaX*deltaX + deltaY*deltaY); // distance btwne goal and state
     double alpha = -_state.theta + std::atan2(deltaY, deltaX); // How much robot needs to turn in order to face waypoint
 
-    // if we collide with current waypoint, then retrieve the next waypoint if there is one
+    // if we are near current waypoint, then retrieve the next waypoint if there is one
     if (rho < 15)
     {
+        // change color of the waypoint
+        _goal->SetColor(Qt::green);
+        goals_.pop();
+
         if (goals_.empty())
             return Velocity(0,0);
-        else 
-        {
-            Point2f nextGoal = goals_.front();
-            SetGoal(nextGoal);
-            goals_.pop();
-        }
     }
     
 
@@ -163,14 +161,15 @@ void Robot::advance(int step)
     // measurement = getMeasurement()
     // estimatedState = filter->EstimateState(measurement)
     State state = GetRobotState();
-    Velocity velocity = GenerateRobotControl(state, goal_);
+    Velocity velocity(0,0);
+    if (!goals_.empty())
+        velocity = GenerateRobotControl(state, goals_.front());
     //Velocity velocity(0,0);
     UpdatePosition(velocity);
 
     // create an item to put into the scene so i can see where the position is represented
     QGraphicsRectItem* trailPoint = new QGraphicsRectItem();
     QPointF point = mapToScene(0, 30);
-    std::cout << "point = " << point.x() << ", " << point.y() << "\n";
     trailPoint->setRect(point.x(), point.y(), 2, 2);
     trailPoint->setBrush(Qt::green);
     //add the item to the scene
@@ -181,19 +180,8 @@ void Robot::advance(int step)
 void Robot::AddWaypoint(Waypoint* _waypt)
 {
     std::cout << "Adding waypoint at " << _waypt->x() << ", " << _waypt->y() << "\n";    
-    goals_.push(Point2f(_waypt->x(),_waypt->y()));
+    goals_.push(_waypt);
     scene()->addItem(_waypt);
-}
-
-void Robot::SetGoal(Point2f _goal)
-{
-    goal_ = _goal;
-}
-
-void Robot::SetGoal(double x, double y)
-{
-    goal_.x = x;
-    goal_.y = y;
 }
 
 void Robot::UpdatePosition(Velocity _vel)

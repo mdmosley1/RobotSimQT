@@ -23,8 +23,12 @@ QPainterPath Waypoint::shape() const
 void Waypoint::paint(QPainter *painter,
                      const QStyleOptionGraphicsItem *option,
                      QWidget *widget)
-{
-    QColor color(0, 255, 0);
-    painter->setBrush(color);
+{    
+    painter->setBrush(color_);
     painter->drawEllipse(-10, -20, 20, 40);
+}
+
+void Waypoint::SetColor(QColor _color)
+{
+    color_ = _color;
 }

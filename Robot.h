@@ -53,7 +53,7 @@ private:
     void IncreaseAngularVelocity();
     void DecreaseAngularVelocity();
     void Brake();
-    Velocity GenerateRobotControl(State _state, Point2f _goal);
+    Velocity GenerateRobotControl(State _state, Waypoint* _goal);
     
     double theta_ = 0;
 
@@ -66,14 +66,12 @@ private:
     const double linearDelta_ = 1;
     const double angularDelta_ = 0.1;
 
-    Point2f goal_ = Point2f(0,0);
-
     Velocity vel_ = Velocity(0.0, 0.0);
     State state_;
     QColor color;
     qreal mouseEyeDirection;
 
-    std::queue<Point2f> goals_;
+    std::queue<Waypoint*> goals_;
 };
 
 #endif // ROBOT_H
