@@ -5,15 +5,17 @@
 #include <QScreen>
 #include <QMessageBox>
 #include <QMetaEnum>
+#include "Robot.h"
+#include <iostream>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(Robot* _robotPtr, QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
   setGeometry(400, 250, 542, 390);
   
-  setupRealtimeDataDemo(ui->customPlot);
+  setupRealtimeDataDemo(ui->customPlot, _robotPtr);
 }
 
 MainWindow::~MainWindow()
@@ -21,7 +23,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setupRealtimeDataDemo(QCustomPlot *customPlot)
+void MainWindow::setupRealtimeDataDemo(QCustomPlot *customPlot, Robot* _robotPtr)
 {
   demoName = "Real Time Data Demo";
   
@@ -43,20 +45,22 @@ void MainWindow::setupRealtimeDataDemo(QCustomPlot *customPlot)
   timeTicker->setTimeFormat("%h:%m:%s");
   customPlot->xAxis->setTicker(timeTicker);
   customPlot->axisRect()->setupFullAxesBox();
-  customPlot->yAxis->setRange(-1.2, 1.2);
+  customPlot->yAxis->setRange(0, 1000);
   
   // make left and bottom axes transfer their ranges to right and top axes:
   connect(customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->xAxis2, SLOT(setRange(QCPRange)));
   connect(customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->yAxis2, SLOT(setRange(QCPRange)));
   
   // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
-  connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
+  //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
+  connect(_robotPtr, SIGNAL(PositionChanged(double, double)),
+          this,      SLOT(realtimeDataSlot(double, double)));
   dataTimer.start(0); // Interval 0 means to refresh as fast as possible
 }
 
 
 
-void MainWindow::realtimeDataSlot()
+void MainWindow::realtimeDataSlot(double _x, double _y)
 {
   static QTime time(QTime::currentTime());
   // calculate two new data points:
@@ -65,8 +69,8 @@ void MainWindow::realtimeDataSlot()
   if (key-lastPointKey > 0.002) // at most add point every 2 ms
   {
     // add data to lines:
-    ui->customPlot->graph(0)->addData(key, qSin(key)+qrand()/(double)RAND_MAX*1*qSin(key/0.3843));
-    ui->customPlot->graph(1)->addData(key, qCos(key)+qrand()/(double)RAND_MAX*0.5*qSin(key/0.4364));
+    ui->customPlot->graph(0)->addData(key, _x);
+    ui->customPlot->graph(1)->addData(key, _y);
     // rescale value (vertical) axis to fit the current data:
     //ui->customPlot->graph(0)->rescaleValueAxis();
     //ui->customPlot->graph(1)->rescaleValueAxis(true);
@@ -91,4 +95,40 @@ void MainWindow::realtimeDataSlot()
     frameCount = 0;
   }
 }
+
+// void MainWindow::realtimeDataSlot()
+// {
+//   static QTime time(QTime::currentTime());
+//   // calculate two new data points:
+//   double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+//   static double lastPointKey = 0;
+//   if (key-lastPointKey > 0.002) // at most add point every 2 ms
+//   {
+//     // add data to lines:
+//     ui->customPlot->graph(0)->addData(key, qSin(key)+qrand()/(double)RAND_MAX*1*qSin(key/0.3843));
+//     ui->customPlot->graph(1)->addData(key, qCos(key)+qrand()/(double)RAND_MAX*0.5*qSin(key/0.4364));
+//     // rescale value (vertical) axis to fit the current data:
+//     //ui->customPlot->graph(0)->rescaleValueAxis();
+//     //ui->customPlot->graph(1)->rescaleValueAxis(true);
+//     lastPointKey = key;
+//   }
+//   // make key axis range scroll with the data (at a constant range size of 8):
+//   ui->customPlot->xAxis->setRange(key, 8, Qt::AlignRight);
+//   ui->customPlot->replot();
+  
+//   // calculate frames per second:
+//   static double lastFpsKey;
+//   static int frameCount;
+//   ++frameCount;
+//   if (key-lastFpsKey > 2) // average fps over 2 seconds
+//   {
+//     ui->statusBar->showMessage(
+//           QString("%1 FPS, Total Data points: %2")
+//           .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
+//           .arg(ui->customPlot->graph(0)->data()->size()+ui->customPlot->graph(1)->data()->size())
+//           , 0);
+//     lastFpsKey = key;
+//     frameCount = 0;
+//   }
+// }
 

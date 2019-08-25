@@ -174,6 +174,14 @@ void Robot::advance(int step)
     trailPoint->setBrush(Qt::green);
     //add the item to the scene
     scene()->addItem(trailPoint);
+    trailPoints_.push(trailPoint);
+    const size_t NUM_POINTS_TO_KEEP = 100;
+    while (trailPoints_.size() > NUM_POINTS_TO_KEEP)
+    {
+        auto point = trailPoints_.front();
+        trailPoints_.pop();
+        scene()->removeItem(point);
+    }
 }
 
 
@@ -196,4 +204,5 @@ void Robot::UpdatePosition(Velocity _vel)
     // std::cout << "PositionY= " << y() << "\n";
     setPos(xn, yn);
     setRotation(theta_*180/M_PI + 90);
+    emit PositionChanged(xn, yn);
 }

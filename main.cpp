@@ -28,7 +28,23 @@ int main(int argc, char **argv)
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
     //QGraphicsView view(&scene);
-    CustomView view(&scene);
+    Robot* robot = new Robot();
+    CustomView view(robot);
+    view.setScene(&scene);
+    scene.addItem(robot);
+    robot->setPos(0,0);
+
+    // add mice
+    for (int i = 0; i < MouseCount; ++i)
+    {
+        Mouse *mouse = new Mouse;
+        mouse->setPos(::sin((i * 6.28) / MouseCount) * 200,
+                      ::cos((i * 6.28) / MouseCount) * 200);
+        scene.addItem(mouse);
+    }
+
+    Waypoint* waypoint = new Waypoint(X_BOUND_MAX/2, Y_BOUND_MAX/2);
+    robot->AddWaypoint(waypoint);
     
     view.setRenderHint(QPainter::Antialiasing);
     view.setBackgroundBrush(QPixmap("images/cheese.jpg"));
@@ -45,10 +61,11 @@ int main(int argc, char **argv)
     QObject::connect(&timer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
     timer.start(1/LOOP_RATE*1000);
 
-    MainWindow w;
-    w.show();
-
     std::cout << "starting program" << "\n";
+
+    MainWindow w(robot);
+    w.show();
+    
     return app.exec();
 }    
 

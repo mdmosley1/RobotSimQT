@@ -12,10 +12,10 @@
 class CustomView: public QGraphicsView
 {
 public:
-    CustomView(QGraphicsScene* scene);
-    Robot * robot;
+    CustomView(Robot* _robot);
+    Robot * robot_;
     void mousePressEvent(QMouseEvent* event) override;
-    QCustomPlot* customPlot;
+    
 
 public slots:
         void realtimeDataSlot();

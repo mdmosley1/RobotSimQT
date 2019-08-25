@@ -9,6 +9,7 @@
 
 #include <QMainWindow>
 #include "qcustomplot.h"
+#include "mainwindow.h"
 
 
 static const int MouseCount = 7;
@@ -19,25 +20,8 @@ const double Y_BOUND_MIN = 0;
 const double X_BOUND_MAX = 1000;
 const double Y_BOUND_MAX = 1000;
 
-CustomView::CustomView(QGraphicsScene* scene)
+CustomView::CustomView(Robot* _robot): robot_(_robot)
 {
-    setScene(scene);
-
-    robot = new Robot();
-    scene->addItem(robot);
-    robot->setPos(0,0);
-
-    // add mice
-    for (int i = 0; i < MouseCount; ++i)
-    {
-        Mouse *mouse = new Mouse;
-        mouse->setPos(::sin((i * 6.28) / MouseCount) * 200,
-                      ::cos((i * 6.28) / MouseCount) * 200);
-        scene->addItem(mouse);
-    }
-
-    Waypoint* waypoint = new Waypoint(X_BOUND_MAX/2, Y_BOUND_MAX/2);
-    robot->AddWaypoint(waypoint);
 }
 
 void CustomView::mousePressEvent(QMouseEvent *event)
@@ -47,7 +31,7 @@ void CustomView::mousePressEvent(QMouseEvent *event)
     std::cout << "Mouse event triggerd at " << x << ", " << y << "\n";
     
     Waypoint* nextWaypoint = new Waypoint(x,y);
-    robot->AddWaypoint(nextWaypoint);
+    robot_->AddWaypoint(nextWaypoint);
     QGraphicsView::mousePressEvent(event);
 }
 

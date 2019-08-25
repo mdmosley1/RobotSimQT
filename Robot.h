@@ -2,7 +2,7 @@
 #define ROBOT_H
 
 //#include <QGraphicsPixmapItem>
-//#include <QObject>
+#include <QObject>
 #include <QGraphicsItem>
 #include <queue>
 #include "Waypoint.h"
@@ -29,10 +29,10 @@ struct State
     double x,y,theta;
 };
 
-
-//class Robot : public QObject, public QGraphicsPixmapItem
-class Robot : public QGraphicsItem
+// using QGraphicsObject instead of qGraphicsItem so that it an emit signals
+class Robot : public QGraphicsObject
 {
+    Q_OBJECT
 public:
     Robot();
     void SetGoal(double x, double y);
@@ -43,6 +43,8 @@ public:
     QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
+signals:
+    void PositionChanged(double xn, double yn);
 public slots:
     void advance(int step) override;
 private:
@@ -72,6 +74,7 @@ private:
     qreal mouseEyeDirection;
 
     std::queue<Waypoint*> goals_;
+    std::queue<QGraphicsRectItem*> trailPoints_;
 };
 
 #endif // ROBOT_H
