@@ -5,6 +5,12 @@
 #include <iostream>
 #include "constants.hh"
 #include "CustomView.h"
+
+#include <QMainWindow>
+#include "qcustomplot.h"
+
+#include "mainwindow.h"
+
 static const int MouseCount = 7;
 
 const double X_BOUND_MIN = 0;
@@ -20,14 +26,6 @@ int main(int argc, char **argv)
     scene.setSceneRect(X_BOUND_MIN, Y_BOUND_MIN, X_BOUND_MAX, Y_BOUND_MAX);
 
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
-
-    // for (int i = 0; i < MouseCount; ++i)
-    // {
-    //     Mouse *mouse = new Mouse;
-    //     mouse->setPos(::sin((i * 6.28) / MouseCount) * 200,
-    //                   ::cos((i * 6.28) / MouseCount) * 200);
-    //     scene.addItem(mouse);
-    // }
 
     //QGraphicsView view(&scene);
     CustomView view(&scene);
@@ -47,7 +45,68 @@ int main(int argc, char **argv)
     QObject::connect(&timer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
     timer.start(1/LOOP_RATE*1000);
 
-    std::cout << "starting program" << "\n";
+    MainWindow w;
+    w.show();
 
+    std::cout << "starting program" << "\n";
     return app.exec();
-}
+}    
+
+    // test out the custom plot
+    // QMainWindow window;
+// // setup customPlot as central widget of window:
+//     QCustomPlot customPlot;
+//     window.setCentralWidget(&customPlot);
+  
+// // create plot (from quadratic plot example):
+//     QVector<double> x(101), y(101);
+//     for (int i=0; i<101; ++i)
+//     {
+//         x[i] = i/50.0 - 1;
+//         y[i] = x[i]*x[i];
+//     }
+//     customPlot.addGraph();
+//     customPlot.graph(0)->setData(x, y);
+//     customPlot.xAxis->setLabel("x");
+//     customPlot.yAxis->setLabel("y");
+//     customPlot.rescaleAxes();
+  
+//     window.setGeometry(100, 100, 500, 400);
+//     window.show();
+
+
+   
+
+
+// int main(int argc, char **argv)
+// {
+//     QApplication app(argc, argv);
+
+//     QMainWindow window;
+  
+// // setup customPlot as central widget of window:
+//     QCustomPlot customPlot;
+//     window.setCentralWidget(&customPlot);
+  
+// // create plot (from quadratic plot example):
+//     QVector<double> x(101), y(101);
+//     for (int i=0; i<101; ++i)
+//     {
+//         x[i] = i/50.0 - 1;
+//         y[i] = x[i]*x[i];
+//     }
+//     customPlot.addGraph();
+//     customPlot.graph(0)->setData(x, y);
+//     customPlot.xAxis->setLabel("x");
+//     customPlot.yAxis->setLabel("y");
+//     customPlot.rescaleAxes();
+  
+//     window.setGeometry(100, 100, 500, 400);
+//     window.show();
+
+//     std::cout << "starting program" << "\n";
+
+//     return app.exec();
+// }
+
+
