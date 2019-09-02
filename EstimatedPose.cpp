@@ -16,7 +16,7 @@ QRectF EstimatedPose::boundingRect() const
 void EstimatedPose::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // Body
-    painter->setBrush(Qt::white);
+    painter->setBrush(QColor(255,255,255,30));
     painter->setPen(Qt::black);
     int width = 20;
     int length = 40;

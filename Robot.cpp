@@ -75,7 +75,7 @@ void Robot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
     painter->drawRect(-15, +10, wheelLength, wheelWidth);
 
     // draw transparent triangle representing the FOV
-    painter->setBrush(QColor(255,0,0,50));
+    painter->setBrush(QColor(255,255,0,50));
     painter->drawPolygon(&pointsFOV_[0], 3);
 }
 
@@ -289,18 +289,17 @@ State Robot::GetNoisyPose(AprilTag* _tag)
 {
     //QPointF ptOffset = mapFromScene(_tag->pos());
     auto robotPos_Tag = mapToItem(_tag, QPointF(0,0));
-    std::cout << "GetNoisePose:: Robot pos Tag = " << robotPos_Tag.x()
-              << ", " << robotPos_Tag.y() << "\n";
-    
+    // std::cout << "GetNoisePose:: Robot pos Tag = " << robotPos_Tag.x()
+    //           << ", " << robotPos_Tag.y() << "\n";
 
     auto robotPos_Scene = _tag->mapToScene(robotPos_Tag);
-    std::cout << "GetNoisePose:: Robot pos Scene = " << robotPos_Scene.x()
-              << ", " << robotPos_Scene.y() << "\n";
+    // std::cout << "GetNoisePose:: Robot pos Scene = " << robotPos_Scene.x()
+    //           << ", " << robotPos_Scene.y() << "\n";
 
     // add noise proportional to distance
-    double robotX_Noise = robotPos_Scene.x() + std::rand() % 5;
-    double robotY_Noise = robotPos_Scene.y() + std::rand() % 5;
-    double theta = rotation() + (std::rand() % 1)*0.1;
+    double robotX_Noise = robotPos_Scene.x() + (std::rand() % 20)-10;
+    double robotY_Noise = robotPos_Scene.y() + (std::rand() % 20)-10;
+    double theta = rotation() + (std::rand() % 5)*0.1 - 0.2;
     
     return State(robotX_Noise, robotY_Noise, theta);
 }
