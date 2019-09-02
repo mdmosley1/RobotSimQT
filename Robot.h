@@ -1,13 +1,12 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-//#include <QGraphicsPixmapItem>
 #include <QObject>
 #include <QGraphicsItem>
 #include <queue>
 #include "Waypoint.h"
-//#include <QMediaPlayer>
-//#include <QMouseEvent>
+#include "AprilTag.h"
+#include "EstimatedPose.h"
 
 
 struct Point2f
@@ -43,11 +42,16 @@ public:
     QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
+    void AddAprilTag(AprilTag* _at);
+    void AddMembersToScene();
+    void SetEstimatedPose(EstimatedPose*);
+    void SetEstimatedPose(State);
+    void SetEstimatedPose(double,double,double);
 signals:
     void PositionChanged(double xn, double yn);
     void UpdateVelocity(double);
 public slots:
-    void GetMeasurement();
+    void GetMeasurementAprilTag();
     void advance(int step) override;
 private:
     void AddGoalToCompleted(Waypoint*);
@@ -58,10 +62,12 @@ private:
     void IncreaseAngularVelocity();
     void DecreaseAngularVelocity();
     void Brake();
-    Velocity GenerateRobotControl(State _state, Waypoint* _goal);
     
-    double theta_ = 0;
-
+    State GetEstimatedPose();
+    State GetNoisyPose(AprilTag* _tag);
+    Velocity GenerateRobotControl(State _state, Waypoint* _goal);
+    bool TagIsInFOV(AprilTag* _tag);
+    
     const double linearVelMax_ = 100;
     const double linearVelMin_ = 0;
 
@@ -73,12 +79,22 @@ private:
 
     Velocity vel_ = Velocity(0.0, 0.0);
     State state_;
-    QColor color;
-    qreal mouseEyeDirection;
+    QColor color_;
 
     std::queue<Waypoint*> goals_;
     std::queue<Waypoint*> goalsCompleted_;
     std::queue<QGraphicsRectItem*> trailPoints_;
+
+    std::vector<AprilTag*> aprilTags_;
+
+    // camera parameters
+    double cameraFOV_;
+    double cameraMaxRange_;
+    std::vector<QPointF> pointsFOV_; // points that determine the FOV triangle
+
+    bool aprilTagReady_ = false;
+
+    EstimatedPose* estimatedPose_ = nullptr;
 };
 
 #endif // ROBOT_H

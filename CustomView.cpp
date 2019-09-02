@@ -12,14 +12,6 @@
 #include "mainwindow.h"
 
 
-static const int MouseCount = 7;
-
-const double X_BOUND_MIN = 0;
-const double Y_BOUND_MIN = 0;
-
-const double X_BOUND_MAX = 1000;
-const double Y_BOUND_MAX = 1000;
-
 CustomView::CustomView(Robot* _robot): robot_(_robot)
 {
     

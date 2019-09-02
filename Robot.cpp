@@ -8,55 +8,76 @@
 #include "Waypoint.h"
 
 
-Robot::Robot(): mouseEyeDirection(0), color(std::rand() % 256, std::rand() % 256, std::rand() % 256)
+Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 {
+    cameraFOV_ = 60 * M_PI / 180.0;
+    cameraMaxRange_ = 500;
+    int widthFOV = std::tan(cameraFOV_)*cameraMaxRange_;
+    pointsFOV_ =
+        {
+            QPointF(30, 0),
+            QPointF(cameraMaxRange_, -widthFOV/2),
+            QPointF(cameraMaxRange_, widthFOV/2),
+        };
+
+    estimatedPose_ = new EstimatedPose(x(), y(), rotation()*M_PI/180);
+    
 }
 
-QRectF Robot::boundingRect() const
+void Robot::AddMembersToScene()
 {
-    qreal adjust = 0.5;
-    return QRectF(-18 - adjust, -22 - adjust,
-                  36 + adjust, 60 + adjust);
+    scene()->addItem(estimatedPose_);
 }
 
 QPainterPath Robot::shape() const
 {
     QPainterPath path;
-    path.addRect(-10, -20, 20, 40);
+    double thetaFOV = 60 * M_PI / 180.0;  // 120 degrees
+    int lengthFOV = 500;
+    int widthFOV = std::tan(thetaFOV)*lengthFOV;
+    QPolygonF triangle;
+    triangle << QPointF(30, 0)
+             << QPointF(lengthFOV, -widthFOV/2)
+             << QPointF(lengthFOV, widthFOV/2);
+    
+    path.addPolygon(triangle);
     return path;
+}
+
+QRectF Robot::boundingRect() const
+{
+    //return QRectF(-30, -30, 100, 100);
+    int x = 1000;
+    return QRectF(-x/2, -x/2, x, x);
 }
 
 void Robot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // Body
-    painter->setBrush(color);
-    painter->drawEllipse(-10, -20, 20, 40);
+    painter->setBrush(Qt::blue);
+    int width = 20;
+    int length = 40;
+    painter->drawRect(-length/2, -width/2, length, width);
 
-    // Eyes
-    painter->setBrush(Qt::white);
-    painter->drawEllipse(-10, -17, 8, 8);
-    painter->drawEllipse(2, -17, 8, 8);
+    // draw front trapezoid
+    static const QPointF points[4] = {
+        QPointF(20, -10),
+        QPointF(30, -5),
+        QPointF(30, +5),
+        QPointF(20, 10),
+    };
+    painter->drawPolygon(points,4);
 
-    // Nose
     painter->setBrush(Qt::black);
-    painter->drawEllipse(QRectF(-2, -22, 4, 4));
+    // draw wheels
+    int wheelLength = 25;
+    int wheelWidth = 5;
+    painter->drawRect(-15, -15, wheelLength, wheelWidth);
+    painter->drawRect(-15, +10, wheelLength, wheelWidth);
 
-    // Pupils
-    painter->drawEllipse(QRectF(-8.0 + mouseEyeDirection, -17, 4, 4));
-    painter->drawEllipse(QRectF(4.0 + mouseEyeDirection, -17, 4, 4));
-
-    // Ears
-    painter->setBrush(scene()->collidingItems(this).isEmpty() ? Qt::darkYellow : Qt::red);
-    painter->drawEllipse(-17, -12, 16, 16);
-    painter->drawEllipse(1, -12, 16, 16);
-
-    // Tail
-    QPainterPath path(QPointF(0, 20));
-    path.cubicTo(-5, 22, -5, 22, 0, 25);
-    path.cubicTo(5, 27, 5, 32, 0, 30);
-    path.cubicTo(-5, 32, -5, 42, 0, 35);
-    painter->setBrush(Qt::NoBrush);
-    painter->drawPath(path);
+    // draw transparent triangle representing the FOV
+    painter->setBrush(QColor(255,0,0,50));
+    painter->drawPolygon(&pointsFOV_[0], 3);
 }
 
 void Robot::IncreaseLinearVelocity()
@@ -120,7 +141,7 @@ Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
 {
     double kp = 20;
     double ka = 5;
-    double kb = 0;
+    double kb = 0;    
 
     double deltaX = _goal->x() - _state.x;
     double deltaY = _goal->y() - _state.y;
@@ -162,25 +183,73 @@ Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
 
 State Robot::GetRobotState()
 {
-    return State(x(), y(), theta_);
+    return State(x(), y(), rotation() * M_PI/180.0);
 }
+
+// void Robot::ChangeColorOfAprilTags()
+// {
+//     QList<QGraphicsItem *> list = collidingItems() ;
+//     foreach(QGraphicsItem * i , list)
+//     {
+//         AprilTag* tag = dynamic_cast<AprilTag *>(i);
+//         if (tag)
+//         {
+//             // std::cout << "encountered tag at position: " << tag->x()
+//             //           << ", " << tag->y()
+//             //           << ", " << tag->rotation()
+//             //           << "\n";
+//             QPointF pt = mapFromScene(tag->pos());
+            
+//             std::cout << "Offset is " << pt.x() << ", " << pt.y() << "\n";
+//             //tag->SetColor(Qt::green);
+
+//             // add gaussian noise to offset based on the angle
+            
+//         }
+//     }
+// }
 
 void Robot::advance(int step)
 {
     if (!step)
-        return;
-    // measurement = getMeasurement()
-    // estimatedState = filter->EstimateState(measurement)
+        return;    
+    
+// measurement = getMeasurement()
+// if (visionMeasurementReady && imuMeasurementReady)
+// {
+//     estimatedState = filter->EstimateState(visionMeasurement, imuMeasurement)
+// }
+// else if (visionMeasurementReady)
+// {
+//     estimatedState = filter->EstimateState(visionMeasurement)
+//         }
+// else if  (imuMeasurementReady)
+//     estimatedState = filter->EstimateState(imuMeasurement)
+//     else
+        
+     // estimatedState = filter->EstimateState(visionMeasurement, imuMeasurement)
+
+
+    // if (aprilTagReady_)
+    // {
+    //     aprilTagReady_ = false;
+    // }
+    // else
+    // {
+    
+    // }
+    
+
     State state = GetRobotState();
+    //State state = GetEstimatedPose();
     Velocity velocity(0,0);
     if (!goals_.empty())
         velocity = GenerateRobotControl(state, goals_.front());
-    //Velocity velocity(0,0);
     UpdatePosition(velocity);
 
     // create an item to put into the scene so i can see where the position is represented
     QGraphicsRectItem* trailPoint = new QGraphicsRectItem();
-    QPointF point = mapToScene(0, 30);
+    QPointF point = mapToScene(-30, 0);
     trailPoint->setRect(point.x(), point.y(), 2, 2);
     trailPoint->setBrush(Qt::green);
     //add the item to the scene
@@ -195,41 +264,141 @@ void Robot::advance(int step)
     }
 }
 
-void Robot::GetMeasurement()
+void Robot::AddAprilTag(AprilTag* _at)
 {
-    std::cout << "A sensor measurment was made!" << "\n";
+    aprilTags_.push_back(_at);
 }
 
-
-void Robot::AddWaypoint(Waypoint* _waypt)
+bool Robot::TagIsInFOV(AprilTag* _tag)
 {
-    std::cout << "Adding waypoint at " << _waypt->x() << ", " << _waypt->y() << "\n";    
-    goals_.push(_waypt);
-    scene()->addItem(_waypt);
+    QPointF pt = mapFromScene(_tag->pos());
+    QPolygonF polyFOV;
+    for (auto& pt : pointsFOV_)
+    {
+        polyFOV << pt;
+    }
+    // create graphicspolygonitem object to determine if point is contained within it
+    return polyFOV.containsPoint(pt, Qt::OddEvenFill);
 }
 
-void Robot::UpdatePosition(Velocity _vel)
+// get robots pose in april tag coordinate frame
+// add noise to the pose. 
+// * Add more x/y noise if far away.
+// * add more heading noise if heaing is very different
+// convert that position to scene frame
+
+State Robot::GetNoisyPose(AprilTag* _tag)
 {
-    double dt = 1/LOOP_RATE; // time step (seconds)
-    double xn = x() + dt*std::cos(theta_)*_vel.linear;
-    double yn = y() + dt*std::sin(theta_)*_vel.linear;
-    theta_ += dt*_vel.angular;
+    //QPointF ptOffset = mapFromScene(_tag->pos());
+    auto robotPos_Tag = mapToItem(_tag, QPointF(0,0));
+    std::cout << "GetNoisePose:: Robot pos Tag = " << robotPos_Tag.x()
+              << ", " << robotPos_Tag.y() << "\n";
+    
 
-    if (theta_ > M_PI)
-        theta_ -= 2*M_PI;
-    if (theta_ < -M_PI)
-        theta_ += 2*M_PI;
+    auto robotPos_Scene = _tag->mapToScene(robotPos_Tag);
+    std::cout << "GetNoisePose:: Robot pos Scene = " << robotPos_Scene.x()
+              << ", " << robotPos_Scene.y() << "\n";
 
-    // std::cout << "Rotation = " << rotation() << "\n";
-    // std::cout << "PositionX = " << x() << "\n";
-    // std::cout << "PositionY= " << y() << "\n";
-    setPos(xn, yn);
-    setRotation(theta_*180/M_PI + 90);
-    emit PositionChanged(xn, yn);
-    emit UpdateVelocity(_vel.linear);
+    // add noise proportional to distance
+    double robotX_Noise = robotPos_Scene.x() + std::rand() % 5;
+    double robotY_Noise = robotPos_Scene.y() + std::rand() % 5;
+    double theta = rotation() + (std::rand() % 1)*0.1;
+    
+    return State(robotX_Noise, robotY_Noise, theta);
 }
 
-// the python measuremnent code for april tags
+// State Robot::GetNoisyPose(AprilTag* _tag)
+// {
+//     QPointF ptOffset = mapFromScene(_tag->pos());
+
+//     // add noise to the measured offset
+//     // ptOffset.setX(ptOffset.x() + std::rand() % 5);
+//     // ptOffset.setY(ptOffset.y() + std::rand() % 5);
+
+//     // get robots pose from offset and tag position
+//     QPointF robotPos = ptOffset + _tag->pos();
+//     std::cout << "GetNoisePose:: Robot pos = " << robotPos.x() << ", " << robotPos.y() << "\n";
+//     double theta = rotation();
+    
+//     return State(robotPos.x(), robotPos.y(), theta);
+// }
+
+// State Robot::GetEstimatedPose()
+// {
+//     return estimatedPose_;
+// }
+
+State Robot::GetEstimatedPose()
+{
+    double x = estimatedPose_->x();
+    double y = estimatedPose_->y();
+    double theta = estimatedPose_->rotation() * M_PI/180.0;
+    
+    return State(x,y,theta);
+}
+
+// void Robot::SetEstimatedPose(State _pose)
+// {
+//     estimatedPose_ = _pose;
+// }
+
+void Robot::SetEstimatedPose(double x, double y, double theta)
+{
+    estimatedPose_->setPos(x, y);
+    estimatedPose_->setRotation(theta);
+}
+
+void Robot::SetEstimatedPose(State _pose)
+{
+    estimatedPose_->setPos(_pose.x, _pose.y);
+    estimatedPose_->setRotation(_pose.theta);
+}
+
+void Robot::SetEstimatedPose(EstimatedPose* _pose)
+{
+    estimatedPose_ = _pose;
+}
+
+void Robot::GetMeasurementAprilTag()
+{
+    // get offset of april tags
+    for (auto tag : aprilTags_)
+    {
+        // transform april tag position into robot coordinate
+        // frame. Then determine if the tag lies in the robot camera's
+        // FOV
+        if (TagIsInFOV(tag))
+        {
+            tag->SetColor(Qt::green);
+            auto pose = GetNoisyPose(tag);
+            std::cout << "Noisy rotation = " << pose.theta << "\n";
+            SetEstimatedPose(pose);
+            aprilTagReady_ = true;
+        }
+        else
+        {
+            tag->SetColor(Qt::red);
+            aprilTagReady_ = false;
+        }
+    }
+}
+    //    Point2D offset = tag_ - position;
+
+    // This function should
+    // * compute the offset between robot and tag,
+    // * add some noise to offset in proportion to distance and angle
+    // * return the noisy offset and the april tags position
+    
+    // Another function accepts the noisy offset and april tags position and then computes the robots position
+
+    
+
+    // Bot should infer its own position from those 2 pieces of information
+
+    
+    //visionMeasurementReady = true;
+    //visionMeasurement_ =  ?;
+        // the python measuremnent code for april tags
 /*
 def get_measurements(self):
         """
@@ -259,13 +428,45 @@ def get_measurements(self):
             x_new = H_RT[0:2,2]
             theta_new = math.atan2(H_RT[1,0], H_RT[0,0])
             marker_view_angle = \
-                np.absolute(np.arccos(x_new[0]/(math.sqrt(x_new[0]**2 + x_new[1]**2))))
+                np.absolute(np.arccos(x_new[0] / (math.sqrt(x_new[0]**2 + x_new[1]**2))) )
             if abs(marker_view_angle) < self.__view_half_angle and abs(theta_new) < np.pi/3 and x_new[0] < 2:
                 self.__visible_markers[i] = True
-                meas_i = np.array([x_new[0],x_new[1], theta_new, self.markers_flipped[i][3], self.last_meas_time])
+                meas_i = np.array([x_new[0], x_new[1], theta_new, self.markers_flipped[i][3], self.last_meas_time])
                 meas_i[0:3] = meas_i[0:3] + np.array([np.random.normal(0, self.__image_noise)])
                 meas.append(meas_i.tolist())
         if not meas:
             meas = None
         return meas
 */
+
+
+
+void Robot::AddWaypoint(Waypoint* _waypt)
+{
+    std::cout << "Adding waypoint at " << _waypt->x() << ", " << _waypt->y() << "\n";    
+    goals_.push(_waypt);
+    scene()->addItem(_waypt);
+}
+
+void Robot::UpdatePosition(Velocity _vel)
+{
+
+    double theta = rotation() * M_PI/180.0;
+    double dt = 1/LOOP_RATE; // time step (seconds)
+    double xn = x() + dt*std::cos(theta)*_vel.linear;
+    double yn = y() + dt*std::sin(theta)*_vel.linear;
+    theta += dt*_vel.angular;
+
+    if (theta > M_PI)
+        theta -= 2*M_PI;
+    if (theta < -M_PI)
+        theta += 2*M_PI;
+
+    // std::cout << "Rotation = " << rotation() << "\n";
+    // std::cout << "PositionX = " << x() << "\n";
+    // std::cout << "PositionY= " << y() << "\n";
+    setPos(xn, yn);
+    setRotation(theta*180/M_PI);
+    emit PositionChanged(xn, yn);
+    emit UpdateVelocity(_vel.linear);
+}

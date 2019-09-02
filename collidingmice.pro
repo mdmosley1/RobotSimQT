@@ -5,14 +5,18 @@ HEADERS += \
         Robot.h \
         CustomView.h\
         Waypoint.h\
-        mainwindow.h
+        mainwindow.h\
+        AprilTag.h\
+        EstimatedPose.h
 SOURCES += \
 	main.cpp \
         mouse.cpp \
         Robot.cpp \
         CustomView.cpp\
         Waypoint.cpp\
-        mainwindow.cpp
+        mainwindow.cpp\
+        AprilTag.cpp\
+        EstimatedPose.cpp
 
 
 QT += core
