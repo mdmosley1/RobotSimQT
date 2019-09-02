@@ -21,7 +21,6 @@ Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
         };
 
     estimatedPose_ = new EstimatedPose(x(), y(), rotation()*M_PI/180);
-    
 }
 
 void Robot::AddMembersToScene()
@@ -230,15 +229,14 @@ void Robot::advance(int step)
      // estimatedState = filter->EstimateState(visionMeasurement, imuMeasurement)
 
 
-    // if (aprilTagReady_)
-    // {
-    //     aprilTagReady_ = false;
-    // }
-    // else
-    // {
+     // if (aprilTagReady_)
+     // {
+     //     aprilTagReady_ = false;
+     // }
+     // else
+     // {
     
-    // }
-    
+     // }       
 
     State state = GetRobotState();
     //State state = GetEstimatedPose();
@@ -377,7 +375,6 @@ void Robot::GetMeasurementAprilTag()
         }
         else
         {
-            tag->SetColor(Qt::red);
             aprilTagReady_ = false;
         }
     }

@@ -1,5 +1,25 @@
 #include "AprilTag.h"
 #include <QPainter>
+#include <iostream>
+using namespace std;
+
+
+void AprilTag::FadeToRed()
+{
+    int r,g,b;
+    color_.getRgb(&r,&g,&b);
+    int changeRate = 32;
+    r = std::min(r+changeRate, 255);
+    g = std::max(g-changeRate, 0);
+    SetColor(QColor(r,g,b));
+}
+
+void AprilTag::advance(int step)
+{
+    if (!step)
+        return;
+    FadeToRed();
+}
 
 AprilTag::AprilTag(int x, int y, double theta)
 {
@@ -30,5 +50,5 @@ void AprilTag::paint(QPainter *painter,
 
 void AprilTag::SetColor(QColor _color)
 {
-    color_ = _color;
+    color_ = _color;    
 }

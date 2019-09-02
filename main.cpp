@@ -41,9 +41,18 @@ int main(int argc, char **argv)
     robot->setPos(X_BOUND_MAX/2, Y_BOUND_MAX/2);
     robot->setRotation(0);
 
-    AprilTag* tag = new AprilTag(100,100,0);
-    scene.addItem(tag);
-    robot->AddAprilTag(tag);
+    AprilTag* tag1 = new AprilTag(100,100,0);
+    AprilTag* tag2 = new AprilTag(900,100,90);
+    AprilTag* tag3 = new AprilTag(900,900,180);
+    AprilTag* tag4 = new AprilTag(100,900,270);
+    scene.addItem(tag1);
+    scene.addItem(tag2);
+    scene.addItem(tag3);
+    scene.addItem(tag4);
+    robot->AddAprilTag(tag1);
+    robot->AddAprilTag(tag2);
+    robot->AddAprilTag(tag3);
+    robot->AddAprilTag(tag4);
 
     // {
     // QPolygonF wall;

@@ -14,6 +14,10 @@ public:
     void SetColor(QColor _color);
 private:
     QColor color_ = QColor(Qt::red);
+    void FadeToRed();                               
+
+public slots:
+    void advance(int step) override;
     
 };
 
