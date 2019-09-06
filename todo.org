@@ -1,0 +1,75 @@
+* DONE Add waypoints
+  CLOSED: [2019-08-24 Sat 20:51]
+  - when waypoint is reached check for next one,
+  - if quque is empty, then stop
+* DONE Take care of the first waypoint
+  CLOSED: [2019-08-24 Sat 20:59]
+* DONE pass waypoint object to robot is better
+  CLOSED: [2019-08-24 Sat 21:06]
+* DONE use collision detection to turn the markers green
+  CLOSED: [2019-08-24 Sat 21:13]
+* DONE path rectangles should be initialized behind the mouse so there is no collision
+  CLOSED: [2019-08-24 Sat 21:33]
+* DONE Robot doesn't need to have a separte goal from the waypoints in the queue
+  CLOSED: [2019-08-24 Sat 21:56]
+* DONE add waypoints to the robots queue
+  CLOSED: [2019-08-24 Sat 21:56]
+* DONE set color of next waypoint to blue, passed ones to green and others to red.
+  CLOSED: [2019-08-24 Sat 21:56]
+* DONE change waypoint color when pass through
+  CLOSED: [2019-08-24 Sat 21:56]
+* DONE fix bogus bboxes im currently using for waypoints
+  CLOSED: [2019-08-24 Sat 22:07]
+* DONE put trail poitns into queue. once queue reaches certain size, delete and pop them from queue
+  CLOSED: [2019-08-25 Sun 13:49]
+* DONE only keep certain number of waypoints
+  CLOSED: [2019-08-25 Sun 14:09]
+* DONE plot the velocity of the robot and label axis
+  CLOSED: [2019-08-25 Sun 15:21]
+* DONE redraw robot so that it faces to the right when rotation() == 0
+  CLOSED: [2019-09-01 Sun 21:50]
+* DONE set size to remove scroll bars
+  CLOSED: [2019-09-01 Sun 21:50]
+
+* DONE redraw april tag so it faces right when rotation is zero
+  CLOSED: [2019-09-02 Mon 15:25]
+* DONE add noise to april tag measurement and visualize with black outline
+  CLOSED: [2019-09-02 Mon 15:24]
+  - do this without changing the control
+  - [X] add graphicsobject called EstimatedRobotPose
+  - [X] make it a member of Robot class
+  - [X] paint method should be same as robot but without FOV. And Black and white
+  - [X] set position and rotation directly using SetPos() and SetRotation()
+* TODO write method that converts april tag x,y,theta measurments into global coordinate measurements
+  - just for clarity
+* TODO add noise for april tag heading angle measurement
+* TODO adjust noise to be centered at zero
+* TODO tag should only turn green if collision is with vehicle
+  - have tag fade to red after being detected
+* TODO add more april tags
+* TODO make FOV yellow instead of red
+* TODO add step where the state is updated based on IMU
+* TODO if tag is facing away do not detect
+* TODO move the sensor measure timer to the robot class constructor
+* TODO create configuration file to store all the constants
+  - [ ] max/min velocities for vehicle and the diff drive controller
+  - [ ] sensor noise
+  - [ ] april tag locations
+  - [ ] number of april tags
+  - [ ] robot start location
+* TODO use painter to translate a pixmap properly
+* TODO add keypress event to the view so user can restart/pause the simulation
+  - use timer.pause and timer.start to do this
+* TODO look at painter paths example
+  - https://doc.qt.io/qt-5/qtwidgets-painting-painterpaths-example.html
+* TODO Add noise to the commanded linear and angular velocity
+* TODO Add noisy imu measurement from python project
+* TODO add april tags
+  - they should be members of robot for easy measurement
+* TODO Add noisy april tags measurment
+* TODO add kalman filter to estimate state
+* TODO add code to the robot's paint method to draw a black outline of the estimated pose
+* TODO Use qtcustom plot to visualize error covariance
+* TODO add path planning using A* algorithm
+* TODO add optimal state space trajectoires that satisfy certain boundary conditions (min jerk)
+* TODO write a target tracking program that estimates future position of moving car and shoots projectile at the predicted position
