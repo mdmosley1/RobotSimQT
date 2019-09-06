@@ -7,7 +7,9 @@ HEADERS += \
         Waypoint.h\
         mainwindow.h\
         AprilTag.h\
-        EstimatedPose.h
+        EstimatedPose.h\
+        ConfigurationYaml.h\
+        logging.h
 SOURCES += \
 	main.cpp \
         mouse.cpp \
@@ -16,7 +18,9 @@ SOURCES += \
         Waypoint.cpp\
         mainwindow.cpp\
         AprilTag.cpp\
-        EstimatedPose.cpp
+        EstimatedPose.cpp \
+        ConfigurationYaml.cpp\
+        logging.cpp
 
 
 QT += core
@@ -30,5 +34,8 @@ DEFINES += QCUSTOMPLOT_USE_LIBRARY
 
 QCPLIB = qcustomplot
 
-LIBS += -L./ -L/usr/local/lib/libqcustomplot.so.2 -l$$QCPLIB  
+LIBS += -L./ -L/usr/local/lib/libqcustomplot.so.2 -l$$QCPLIB
+
+LIBS += -lyamlconfig  `pkg-config liblog4cxx --libs` -lyaml-cpp
+
 

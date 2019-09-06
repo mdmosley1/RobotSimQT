@@ -1,0 +1,8 @@
+%YAML:1.2
+
+#
+x_bound_min: 0
+x_bound_max: 1000
+
+y_bound_min: 0
+y_bound_max: 1000

@@ -13,21 +13,19 @@
 #include "mainwindow.h"
 #include <QGraphicsPolygonItem>
 #include "EstimatedPose.h"
-
+#include "ConfigurationYaml.h"
 
 static const int MouseCount = 7;
 
-const double X_BOUND_MIN = 0;
-const double Y_BOUND_MIN = 0;
-
-const double X_BOUND_MAX = 1000;
-const double Y_BOUND_MAX = 1000;
-
 int main(int argc, char **argv)
 {
+    ConfigurationYaml configYaml;
+    configYaml.Init("config.yaml");
+    
     QApplication app(argc, argv);
     QGraphicsScene scene;
-    scene.setSceneRect(X_BOUND_MIN, Y_BOUND_MIN, X_BOUND_MAX, Y_BOUND_MAX);
+    scene.setSceneRect(configYaml.x_bound_min_, configYaml.y_bound_min_,
+                       configYaml.x_bound_max_, configYaml.y_bound_max_);
 
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -38,7 +36,8 @@ int main(int argc, char **argv)
     scene.addItem(robot);
     robot->AddMembersToScene();
     
-    robot->setPos(X_BOUND_MAX/2, Y_BOUND_MAX/2);
+    robot->setPos(configYaml.x_bound_max_/2,
+                  configYaml.y_bound_max_/2);
     robot->setRotation(0);
 
     AprilTag* tag1 = new AprilTag(100,100,0);
@@ -71,8 +70,8 @@ int main(int argc, char **argv)
         for (int i = 0; i < MouseCount; ++i)
         {
             Mouse *mouse = new Mouse;
-            mouse->setPos(std::rand() % int(X_BOUND_MAX),
-                          std::rand() % int(Y_BOUND_MAX));
+            mouse->setPos(std::rand() % int(configYaml.x_bound_max_),
+                          std::rand() % int(configYaml.y_bound_max_));
             std::cout << "Mouse at position = " << mouse->pos().x()<< "\n";
             scene.addItem(mouse);
         }
@@ -86,7 +85,7 @@ int main(int argc, char **argv)
 
     view.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view.setFixedSize(X_BOUND_MAX, Y_BOUND_MAX);
+    view.setFixedSize(configYaml.x_bound_max_, configYaml.y_bound_max_);
 
     view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
     view.show();
