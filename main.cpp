@@ -1,4 +1,7 @@
-#include <QtWidgets>
+//#include <QtWidgets>
+// Changed from QtWidgets to QWidget because I have QT 5 on mac
+#include <QWidget>
+
 #include <math.h>
 #include "mouse.h"
 #include "Robot.h"

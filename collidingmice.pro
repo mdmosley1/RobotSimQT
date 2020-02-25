@@ -1,3 +1,6 @@
+# Note: when compiling on mac os x, run the following: 
+# QMAKESPEC=macx-g++ qmake
+
 QT += widgets
 
 HEADERS += \
@@ -35,7 +38,4 @@ DEFINES += QCUSTOMPLOT_USE_LIBRARY
 QCPLIB = qcustomplot
 
 LIBS += -L./ -L/usr/local/lib/ -lqcustomplot -l$$QCPLIB
-
 LIBS += -lyamlconfig  `pkg-config liblog4cxx --libs` -lyaml-cpp
-
-
