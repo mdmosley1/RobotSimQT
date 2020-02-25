@@ -28,6 +28,13 @@ struct State
     double x,y,theta;
 };
 
+struct ImuMeasurement
+{
+    ImuMeasurement(double _o, double _s) : omega(_o), stamp(_s) {};
+    ImuMeasurement() : omega(0), stamp(0) {};
+    double omega,stamp;
+};
+
 // using QGraphicsObject instead of qGraphicsItem so that it an emit signals
 class Robot : public QGraphicsObject
 {
@@ -51,22 +58,29 @@ signals:
     void PositionChanged(double xn, double yn);
     void UpdateVelocity(double);
 public slots:
-    void GetMeasurementAprilTag();
     void advance(int step) override;
 private:
+    void CommandRobotVelocity(Velocity _vel);
+    State* GetMeasurementAprilTag();
+    ImuMeasurement* GetMeasurementIMU();
+    std::tuple<ImuMeasurement*, State*> GetMeasurements();
     void AddGoalToCompleted(Waypoint*);
-    void UpdatePosition(Velocity _vel); 
-    State GetRobotState();
-    void IncreaseLinearVelocity();
-    void DecreaseLinearVelocity();
-    void IncreaseAngularVelocity();
-    void DecreaseAngularVelocity();
     void Brake();
-    
+    bool CameraReady();
+    void DecreaseLinearVelocity();
+    void DecreaseAngularVelocity();
+    State GetRobotState();
     State GetEstimatedPose();
-    State GetNoisyPose(AprilTag* _tag);
+    State* GetNoisyPose(AprilTag* _tag);
     Velocity GenerateRobotControl(State _state, Waypoint* _goal);
+    void IncreaseLinearVelocity();
+    void IncreaseAngularVelocity();
+    void SetVelocity(Velocity _vel);
+    void UpdatePosition();
     bool TagIsInFOV(AprilTag* _tag);
+
+    const double processNoiseLinear_ = 1.0;
+    const double processNoiseAngular_ = 1.0;
     
     const double linearVelMax_ = 100;
     const double linearVelMin_ = 0;
@@ -76,6 +90,14 @@ private:
 
     const double linearDelta_ = 1;
     const double angularDelta_ = 0.1;
+
+    // std deviation of control noise
+    const double controlNoiseLinear_ = 0.05;
+    const double controlNoiseAngular_ = 0.05;
+
+    const double imuNoise_ = 0.01;
+
+    double imuMeas_ = 0.0; // the angular velocity measured by IMU
 
     Velocity vel_ = Velocity(0.0, 0.0);
     State state_;
@@ -95,6 +117,10 @@ private:
     bool aprilTagReady_ = false;
 
     EstimatedPose* estimatedPose_ = nullptr;
+
+    State noisyPose_;
+
+    ImuMeasurement imuMeasurement_;
 };
 
 #endif // ROBOT_H

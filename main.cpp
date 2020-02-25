@@ -90,19 +90,25 @@ int main(int argc, char **argv)
     view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
     view.show();
 
-    QTimer timer;
-    QObject::connect(&timer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
-    timer.start(1/LOOP_RATE*1000);
+    // start a timer to display graphics at 30 frames per second
+    QTimer graphicsTimer;
+    QObject::connect(&graphicsTimer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
+    graphicsTimer.start(1/LOOP_RATE*1000);
 
-    QTimer timerSensor;
-    QObject::connect(&timerSensor, &QTimer::timeout,
-                       robot, &Robot::GetMeasurementAprilTag);
-    timerSensor.start(1000); // once per second
+    // QTimer timerCamera;
+    // QObject::connect(&timerCamera, &QTimer::timeout,
+    //                    robot, &Robot::GetMeasurementAprilTag);
+    // timerCamera.start(1000); // 1 Hz
+
+    // QTimer timerIMU;
+    // QObject::connect(&timerIMU, &QTimer::timeout,
+    //                  robot, &Robot::GetMeasurementIMU);
+    // timerIMU.start(20); // 50 Hz
 
     std::cout << "starting program" << "\n";
 
-    MainWindow w(robot);
-    w.show();
+    MainWindow mainWindow(robot);
+    mainWindow.show();
     
     return app.exec();
 } 

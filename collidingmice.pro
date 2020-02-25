@@ -34,7 +34,7 @@ DEFINES += QCUSTOMPLOT_USE_LIBRARY
 
 QCPLIB = qcustomplot
 
-LIBS += -L./ -L/usr/local/lib/libqcustomplot.so.2 -l$$QCPLIB
+LIBS += -L./ -L/usr/local/lib/ -lqcustomplot -l$$QCPLIB
 
 LIBS += -lyamlconfig  `pkg-config liblog4cxx --libs` -lyaml-cpp
 

@@ -40,14 +40,16 @@
   - [X] make it a member of Robot class
   - [X] paint method should be same as robot but without FOV. And Black and white
   - [X] set position and rotation directly using SetPos() and SetRotation()
-* TODO write method that converts april tag x,y,theta measurments into global coordinate measurements
-  - just for clarity
-* TODO add noise for april tag heading angle measurement
+* TODO use simulation time like in python project
+  - this would be useful for pausing or speeding up the simulation
+  - [ ] robot should have member variable called frame_num that starts at
+    zero and increments every time the advance is called
+  - [ ] global simulation time is frame number * dt, where dt = 1/LOOP_RATE
+  - [ ] Display the simulation time at the top of the window
+* TODO read imu like in python project. 
+  - no asynchronous callbacks; just check to see if enough time has passed
+* TODO do same with camera read
 * TODO adjust noise to be centered at zero
-* TODO tag should only turn green if collision is with vehicle
-  - have tag fade to red after being detected
-* TODO add more april tags
-* TODO make FOV yellow instead of red
 * TODO add step where the state is updated based on IMU
 * TODO if tag is facing away do not detect
 * TODO move the sensor measure timer to the robot class constructor
@@ -71,5 +73,8 @@
 * TODO add code to the robot's paint method to draw a black outline of the estimated pose
 * TODO Use qtcustom plot to visualize error covariance
 * TODO add path planning using A* algorithm
+* TODO use kalman filter to predict where bot will be 3 seconds from now
+  - display as red outline
 * TODO add optimal state space trajectoires that satisfy certain boundary conditions (min jerk)
-* TODO write a target tracking program that estimates future position of moving car and shoots projectile at the predicted position
+* TODO Figure out how to host this on a website
+  - I think qt supports this somehow

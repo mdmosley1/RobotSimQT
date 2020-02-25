@@ -21,6 +21,7 @@ Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
         };
 
     estimatedPose_ = new EstimatedPose(x(), y(), rotation()*M_PI/180);
+    noisyPose_ = State(0,0,0);
 }
 
 void Robot::AddMembersToScene()
@@ -77,6 +78,13 @@ void Robot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
     // draw transparent triangle representing the FOV
     painter->setBrush(QColor(255,255,0,50));
     painter->drawPolygon(&pointsFOV_[0], 3);
+}
+
+double GetRandN(double mean, double var)
+{
+    std::default_random_engine gen;
+    std::normal_distribution<double> dist(mean, var);
+    return dist(gen);
 }
 
 void Robot::IncreaseLinearVelocity()
@@ -208,6 +216,16 @@ State Robot::GetRobotState()
 //     }
 // }
 
+std::tuple<ImuMeasurement*, State*> Robot::GetMeasurements()
+{
+    State* cameraMeas = GetMeasurementAprilTag();
+    ImuMeasurement* imuMeas = GetMeasurementIMU();
+
+    return std::make_tuple(imuMeas, cameraMeas);
+}
+
+
+
 void Robot::advance(int step)
 {
     if (!step)
@@ -236,15 +254,35 @@ void Robot::advance(int step)
      // else
      // {
     
-     // }       
+     // }
+
+    std::cout << "Robot advance!" << "\n";
+
+    // (i) get measurement (add noise to omega set in step iv)
+    ImuMeasurement* imuMeas = nullptr;
+    State* cameraMeas = nullptr;
+    std::tie(imuMeas, cameraMeas) = GetMeasurements();
+    // (ii) estimate state using EKF
+    // state = kalmanFilter_.EstimateState(imuMeas, cameraMeas);
 
     State state = GetRobotState();
     //State state = GetEstimatedPose();
-    Velocity velocity(0,0);
-    if (!goals_.empty())
-        velocity = GenerateRobotControl(state, goals_.front());
-    UpdatePosition(velocity);
 
+    // (iii) compute velocity from diff drive controller
+    Velocity velocity(0,0);
+    
+    if (!goals_.empty())
+    {
+        Waypoint* wayPt = goals_.front();
+        velocity = GenerateRobotControl(state, wayPt);
+    }
+    // (iv) command robot velocity to that computed by diff drive controller (plus process noise)
+    CommandRobotVelocity(velocity);
+
+    // update the position of the robot based on the set velocity
+    UpdatePosition();
+
+    // refactor below into separate method for managing the trail path
     // create an item to put into the scene so i can see where the position is represented
     QGraphicsRectItem* trailPoint = new QGraphicsRectItem();
     QPointF point = mapToScene(-30, 0);
@@ -260,6 +298,20 @@ void Robot::advance(int step)
         trailPoints_.pop();
         scene()->removeItem(point);
     }
+}
+
+void Robot::CommandRobotVelocity(Velocity _vel)
+{
+    // add noise to velocity to model the process noise
+    _vel.linear += GetRandN(0.0, processNoiseLinear_);
+    _vel.angular += GetRandN(0.0, processNoiseAngular_);
+
+    SetVelocity(_vel);
+}
+
+void Robot::SetVelocity(Velocity _vel)
+{
+    vel_ = _vel;
 }
 
 void Robot::AddAprilTag(AprilTag* _at)
@@ -285,7 +337,7 @@ bool Robot::TagIsInFOV(AprilTag* _tag)
 // * add more heading noise if heaing is very different
 // convert that position to scene frame
 
-State Robot::GetNoisyPose(AprilTag* _tag)
+State* Robot::GetNoisyPose(AprilTag* _tag)
 {
     //QPointF ptOffset = mapFromScene(_tag->pos());
     auto robotPos_Tag = mapToItem(_tag, QPointF(0,0));
@@ -296,12 +348,14 @@ State Robot::GetNoisyPose(AprilTag* _tag)
     // std::cout << "GetNoisePose:: Robot pos Scene = " << robotPos_Scene.x()
     //           << ", " << robotPos_Scene.y() << "\n";
 
-    // add noise proportional to distance
+    // add noise
     double robotX_Noise = robotPos_Scene.x() + (std::rand() % 20)-10;
     double robotY_Noise = robotPos_Scene.y() + (std::rand() % 20)-10;
     double theta = rotation() + (std::rand() % 5)*0.1 - 0.2;
+
+    noisyPose_ = State(robotX_Noise, robotY_Noise, theta);
     
-    return State(robotX_Noise, robotY_Noise, theta);
+    return &noisyPose_;
 }
 
 // State Robot::GetNoisyPose(AprilTag* _tag)
@@ -356,9 +410,28 @@ void Robot::SetEstimatedPose(EstimatedPose* _pose)
     estimatedPose_ = _pose;
 }
 
-void Robot::GetMeasurementAprilTag()
+
+ImuMeasurement* Robot::GetMeasurementIMU()
+{
+    //if (!imuReady())
+         return nullptr;
+
+    // imuMeasurement_.omega = vel_.angular + GetRandN(0.0, imuNoise_);
+    // imuMeasurement_.stamp = GetSimTime();
+    // return &imuMeasurement_;
+}
+
+bool Robot::CameraReady()
+{
+    return true;
+}
+
+State* Robot::GetMeasurementAprilTag()
 {
     // get offset of april tags
+     if (!CameraReady())
+         return nullptr;
+        
     for (auto tag : aprilTags_)
     {
         // transform april tag position into robot coordinate
@@ -367,16 +440,13 @@ void Robot::GetMeasurementAprilTag()
         if (TagIsInFOV(tag))
         {
             tag->SetColor(Qt::green);
-            auto pose = GetNoisyPose(tag);
-            std::cout << "Noisy rotation = " << pose.theta << "\n";
-            SetEstimatedPose(pose);
-            aprilTagReady_ = true;
-        }
-        else
-        {
-            aprilTagReady_ = false;
+            return GetNoisyPose(tag);
+            //std::cout << "Noisy rotation = " << pose.theta << "\n";
+            //SetEstimatedPose(pose);
+            
         }
     }
+    return nullptr;
 }
     //    Point2D offset = tag_ - position;
 
@@ -399,7 +469,7 @@ void Robot::GetMeasurementAprilTag()
 def get_measurements(self):
         """
         Returns a list of lists of visible landmarks and a fresh boolean that
-        checks if it the measurement is ready
+        checks if the measurement is ready
         Outputs:
         measurements - a N by 5 list of visible tags or None. The tags are in
             the form in the form (x,y,theta,id,time) with x,y being the 2D
@@ -444,14 +514,13 @@ void Robot::AddWaypoint(Waypoint* _waypt)
     scene()->addItem(_waypt);
 }
 
-void Robot::UpdatePosition(Velocity _vel)
+void Robot::UpdatePosition()
 {
-
     double theta = rotation() * M_PI/180.0;
     double dt = 1/LOOP_RATE; // time step (seconds)
-    double xn = x() + dt*std::cos(theta)*_vel.linear;
-    double yn = y() + dt*std::sin(theta)*_vel.linear;
-    theta += dt*_vel.angular;
+    double xn = x() + dt*std::cos(theta)*vel_.linear;
+    double yn = y() + dt*std::sin(theta)*vel_.linear;
+    theta += dt*vel_.angular;
 
     if (theta > M_PI)
         theta -= 2*M_PI;
@@ -464,5 +533,5 @@ void Robot::UpdatePosition(Velocity _vel)
     setPos(xn, yn);
     setRotation(theta*180/M_PI);
     emit PositionChanged(xn, yn);
-    emit UpdateVelocity(_vel.linear);
+    emit UpdateVelocity(vel_.linear);
 }

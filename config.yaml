@@ -6,3 +6,20 @@ x_bound_max: 1000
 
 y_bound_min: 0
 y_bound_max: 1000
+
+AprilTags:
+  - posx: 100
+    posy: 100
+    theta: 0
+  - posx: 900
+    posy: 100
+    theta: 90
+  - posx: 900
+    posy: 900
+    theta: 180
+  - posx: 100
+    posy: 900
+    theta: 270   
+    
+  
+  
