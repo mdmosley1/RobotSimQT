@@ -1,3 +1,6 @@
+# Note: when compiling on mac os x, run the following: 
+# QMAKESPEC=macx-g++ qmake
+
 QT += widgets
 
 HEADERS += \
@@ -30,5 +33,5 @@ DEFINES += QCUSTOMPLOT_USE_LIBRARY
 
 QCPLIB = qcustomplot
 
-LIBS += -L./ -L/usr/local/lib/libqcustomplot.so.2 -l$$QCPLIB  
+LIBS += -L./ -L/usr/local/lib/ -l$$QCPLIB
 
