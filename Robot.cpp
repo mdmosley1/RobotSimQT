@@ -6,6 +6,7 @@
 #include "qpainter.h"
 #include "constants.hh"
 #include "Waypoint.h"
+#include <random>
 
 
 Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
