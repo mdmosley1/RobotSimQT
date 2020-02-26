@@ -11,7 +11,6 @@ HEADERS += \
         mainwindow.h\
         AprilTag.h\
         EstimatedPose.h\
-        ConfigurationYaml.h\
         logging.h
 SOURCES += \
 	main.cpp \
@@ -22,7 +21,6 @@ SOURCES += \
         mainwindow.cpp\
         AprilTag.cpp\
         EstimatedPose.cpp \
-        ConfigurationYaml.cpp\
         logging.cpp
 
 
@@ -38,4 +36,7 @@ DEFINES += QCUSTOMPLOT_USE_LIBRARY
 QCPLIB = qcustomplot
 
 LIBS += -L./ -L/usr/local/lib/ -lqcustomplot -l$$QCPLIB
-LIBS += -lyamlconfig  `pkg-config liblog4cxx --libs` -lyaml-cpp
+LIBS +=  `pkg-config liblog4cxx --libs`
+
+# include for log4cxx
+QMAKE_CXXFLAGS += -I/usr/local/include/
