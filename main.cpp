@@ -16,19 +16,24 @@
 #include "mainwindow.h"
 #include <QGraphicsPolygonItem>
 #include "EstimatedPose.h"
-#include "ConfigurationYaml.h"
+//#include "ConfigurationYaml.h"
 
 static const int MouseCount = 7;
 
 int main(int argc, char **argv)
 {
-    ConfigurationYaml configYaml;
-    configYaml.Init("config.yaml");
+    //ConfigurationYaml configYaml;
+    //configYaml.Init("config.yaml");
     
     QApplication app(argc, argv);
     QGraphicsScene scene;
-    scene.setSceneRect(configYaml.x_bound_min_, configYaml.y_bound_min_,
-                       configYaml.x_bound_max_, configYaml.y_bound_max_);
+    int x_bound_min_ = 0;
+    int x_bound_max_ = 1000;
+    int y_bound_min_ = 0;
+    int y_bound_max_ = 1000;
+    
+    scene.setSceneRect(x_bound_min_, y_bound_min_,
+                       x_bound_max_, y_bound_max_);
 
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -39,8 +44,8 @@ int main(int argc, char **argv)
     scene.addItem(robot);
     robot->AddMembersToScene();
     
-    robot->setPos(configYaml.x_bound_max_/2,
-                  configYaml.y_bound_max_/2);
+    robot->setPos(x_bound_max_/2,
+                  y_bound_max_/2);
     robot->setRotation(0);
 
     AprilTag* tag1 = new AprilTag(100,100,0);
@@ -73,8 +78,8 @@ int main(int argc, char **argv)
         for (int i = 0; i < MouseCount; ++i)
         {
             Mouse *mouse = new Mouse;
-            mouse->setPos(std::rand() % int(configYaml.x_bound_max_),
-                          std::rand() % int(configYaml.y_bound_max_));
+            mouse->setPos(std::rand() % int(x_bound_max_),
+                          std::rand() % int(y_bound_max_));
             std::cout << "Mouse at position = " << mouse->pos().x()<< "\n";
             scene.addItem(mouse);
         }
@@ -88,7 +93,7 @@ int main(int argc, char **argv)
 
     view.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view.setFixedSize(configYaml.x_bound_max_, configYaml.y_bound_max_);
+    view.setFixedSize(x_bound_max_, y_bound_max_);
 
     view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
     view.show();
