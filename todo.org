@@ -40,6 +40,7 @@
   - [X] make it a member of Robot class
   - [X] paint method should be same as robot but without FOV. And Black and white
   - [X] set position and rotation directly using SetPos() and SetRotation()
+* TODO load settings using QTSettings instead of yaml
 * TODO use simulation time like in python project
   - this would be useful for pausing or speeding up the simulation
   - [ ] robot should have member variable called frame_num that starts at
