@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     }
 
     view.setRenderHint(QPainter::Antialiasing);
-    view.setBackgroundBrush(QPixmap("images/cheese.jpg"));
+    //view.setBackgroundBrush(QPixmap("images/cheese.jpg"));
 
     view.setCacheMode(QGraphicsView::CacheBackground);
     view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
@@ -95,23 +95,13 @@ int main(int argc, char **argv)
     view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view.setFixedSize(x_bound_max_, y_bound_max_);
 
-    view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
+    view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Kalman Filter Example"));
     view.show();
 
     // start a timer to display graphics at 30 frames per second
     QTimer graphicsTimer;
     QObject::connect(&graphicsTimer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
     graphicsTimer.start(1/LOOP_RATE*1000);
-
-    // QTimer timerCamera;
-    // QObject::connect(&timerCamera, &QTimer::timeout,
-    //                    robot, &Robot::GetMeasurementAprilTag);
-    // timerCamera.start(1000); // 1 Hz
-
-    // QTimer timerIMU;
-    // QObject::connect(&timerIMU, &QTimer::timeout,
-    //                  robot, &Robot::GetMeasurementIMU);
-    // timerIMU.start(20); // 50 Hz
 
     std::cout << "starting program" << "\n";
 

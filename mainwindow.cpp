@@ -14,15 +14,9 @@ MainWindow::MainWindow(Robot* _robotPtr, QWidget *parent) :
 {
   ui->setupUi(this);
   setGeometry(400, 250, 542, 390);
-  
+
   setupPosPlot(ui->customPlotPos, _robotPtr);
   setupVelPlot(ui->customPlotVel, _robotPtr);
-
-
-  
-  connect(&dataTimer, SIGNAL(timeout()),
-          _robotPtr, SLOT(GetMeasurement()));
-  dataTimer.start(1000); // once per second
 }
 
 MainWindow::~MainWindow()
