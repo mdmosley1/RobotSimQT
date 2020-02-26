@@ -8,6 +8,7 @@
 #include "Waypoint.h"
 #include <random>
 
+double SIM_TIME_INCREMENT = 0.1;
 
 Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 {
@@ -229,8 +230,9 @@ std::tuple<ImuMeasurement*, State*> Robot::GetMeasurements()
 
 void Robot::advance(int step)
 {
+    simTime_ += SIM_TIME_INCREMENT;
     if (!step)
-        return;    
+        return;
     
 // measurement = getMeasurement()
 // if (visionMeasurementReady && imuMeasurementReady)
@@ -424,7 +426,18 @@ ImuMeasurement* Robot::GetMeasurementIMU()
 
 bool Robot::CameraReady()
 {
-    return true;
+    static double lastCameraMeasurement = simTime_;
+    static const double cameraRefreshTime_ = 1.0;
+
+    if (simTime_ - lastCameraMeasurement> cameraRefreshTime_)
+    {
+        lastCameraMeasurement = simTime_;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 State* Robot::GetMeasurementAprilTag()
@@ -432,7 +445,7 @@ State* Robot::GetMeasurementAprilTag()
     // get offset of april tags
      if (!CameraReady())
          return nullptr;
-        
+
     for (auto tag : aprilTags_)
     {
         // transform april tag position into robot coordinate
@@ -444,7 +457,6 @@ State* Robot::GetMeasurementAprilTag()
             return GetNoisyPose(tag);
             //std::cout << "Noisy rotation = " << pose.theta << "\n";
             //SetEstimatedPose(pose);
-            
         }
     }
     return nullptr;

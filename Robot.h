@@ -97,6 +97,8 @@ private:
 
     const double imuNoise_ = 0.01;
 
+    
+
     double imuMeas_ = 0.0; // the angular velocity measured by IMU
 
     Velocity vel_ = Velocity(0.0, 0.0);
@@ -121,6 +123,7 @@ private:
     State noisyPose_;
 
     ImuMeasurement imuMeasurement_;
-};
 
+    double simTime_ = 0.0;
+};
 #endif // ROBOT_H
