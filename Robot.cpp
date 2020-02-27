@@ -270,8 +270,7 @@ void Robot::advance(int step)
     // update the position of the robot based on the set velocity
     UpdatePosition();
 
-    // refactor below into separate method for managing the trail path
-    // create an item to put into the scene so i can see where the position is represented
+    // Add "bread crumbs" to represent where the robot has been
     ManageRobotTrail();
 }
 

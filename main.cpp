@@ -27,13 +27,13 @@ int main(int argc, char **argv)
     
     QApplication app(argc, argv);
     QGraphicsScene scene;
-    int x_bound_min_ = 0;
-    int x_bound_max_ = 1000;
-    int y_bound_min_ = 0;
-    int y_bound_max_ = 1000;
+    int x_bound_min = 0;
+    int x_bound_max = 1000;
+    int y_bound_min = 0;
+    int y_bound_max = 600;
     
-    scene.setSceneRect(x_bound_min_, y_bound_min_,
-                       x_bound_max_, y_bound_max_);
+    scene.setSceneRect(x_bound_min, y_bound_min,
+                       x_bound_max, y_bound_max);
 
     scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -44,14 +44,19 @@ int main(int argc, char **argv)
     scene.addItem(robot);
     robot->AddMembersToScene();
     
-    robot->setPos(x_bound_max_/2,
-                  y_bound_max_/2);
+    robot->setPos(x_bound_max/2,
+                  y_bound_max/2);
     robot->setRotation(0);
 
-    AprilTag* tag1 = new AprilTag(100,100,0);
-    AprilTag* tag2 = new AprilTag(900,100,90);
-    AprilTag* tag3 = new AprilTag(900,900,180);
-    AprilTag* tag4 = new AprilTag(100,900,270);
+    int offset = 100;
+    AprilTag* tag1 = new AprilTag(x_bound_min + offset,
+                                  y_bound_min + offset, 0);
+    AprilTag* tag2 = new AprilTag(x_bound_max - offset,
+                                  y_bound_min + offset, 90);
+    AprilTag* tag3 = new AprilTag(x_bound_max - offset,
+                                  y_bound_max - offset,180);
+    AprilTag* tag4 = new AprilTag(x_bound_min + offset,
+                                  y_bound_max - offset,270);
     scene.addItem(tag1);
     scene.addItem(tag2);
     scene.addItem(tag3);
@@ -78,8 +83,8 @@ int main(int argc, char **argv)
         for (int i = 0; i < MouseCount; ++i)
         {
             Mouse *mouse = new Mouse;
-            mouse->setPos(std::rand() % int(x_bound_max_),
-                          std::rand() % int(y_bound_max_));
+            mouse->setPos(std::rand() % int(x_bound_max),
+                          std::rand() % int(y_bound_max));
             std::cout << "Mouse at position = " << mouse->pos().x()<< "\n";
             scene.addItem(mouse);
         }
@@ -92,7 +97,7 @@ int main(int argc, char **argv)
 
     view.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view.setFixedSize(x_bound_max_, y_bound_max_);
+    view.setFixedSize(x_bound_max, y_bound_max);
 
     view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Kalman Filter Example"));
     view.show();
