@@ -67,6 +67,7 @@ private:
     void AddGoalToCompleted(Waypoint*);
     void Brake();
     bool CameraReady();
+    void DisplayTime();
     void DecreaseLinearVelocity();
     void DecreaseAngularVelocity();
     State GetRobotState();
@@ -125,5 +126,7 @@ private:
     ImuMeasurement imuMeasurement_;
 
     double simTime_ = 0.0;
+
+    QGraphicsTextItem* timeTextItem_;
 };
 #endif // ROBOT_H

@@ -8,7 +8,7 @@
 #include "Waypoint.h"
 #include <random>
 
-double SIM_TIME_INCREMENT = 0.1;
+double SIM_TIME_INCREMENT = 1 / LOOP_RATE;
 
 Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 {
@@ -24,6 +24,8 @@ Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 
     estimatedPose_ = new EstimatedPose(x(), y(), rotation()*M_PI/180);
     noisyPose_ = State(0,0,0);
+
+    timeTextItem_ = new QGraphicsTextItem;
 }
 
 void Robot::AddMembersToScene()
@@ -226,11 +228,22 @@ std::tuple<ImuMeasurement*, State*> Robot::GetMeasurements()
     return std::make_tuple(imuMeas, cameraMeas);
 }
 
-
+void Robot::DisplayTime()
+{
+    scene()->removeItem(timeTextItem_);
+    timeTextItem_->setPos(150,20);
+    QString timeStr; timeStr.setNum(simTime_);
+    timeTextItem_->setPlainText(timeStr);
+    scene()->addItem(timeTextItem_);
+}
 
 void Robot::advance(int step)
 {
     simTime_ += SIM_TIME_INCREMENT;
+
+    DisplayTime();
+    
+
     if (!step)
         return;
     

@@ -86,7 +86,6 @@ int main(int argc, char **argv)
     }
 
     view.setRenderHint(QPainter::Antialiasing);
-    //view.setBackgroundBrush(QPixmap("images/cheese.jpg"));
 
     view.setCacheMode(QGraphicsView::CacheBackground);
     view.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
