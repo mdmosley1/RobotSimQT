@@ -300,6 +300,11 @@ void Robot::advance(int step)
 
     // refactor below into separate method for managing the trail path
     // create an item to put into the scene so i can see where the position is represented
+    ManageRobotTrail();
+}
+
+void Robot::ManageRobotTrail()
+{
     QGraphicsRectItem* trailPoint = new QGraphicsRectItem();
     QPointF point = mapToScene(-30, 0);
     trailPoint->setRect(point.x(), point.y(), 2, 2);
@@ -374,27 +379,6 @@ State* Robot::GetNoisyPose(AprilTag* _tag)
     return &noisyPose_;
 }
 
-// State Robot::GetNoisyPose(AprilTag* _tag)
-// {
-//     QPointF ptOffset = mapFromScene(_tag->pos());
-
-//     // add noise to the measured offset
-//     // ptOffset.setX(ptOffset.x() + std::rand() % 5);
-//     // ptOffset.setY(ptOffset.y() + std::rand() % 5);
-
-//     // get robots pose from offset and tag position
-//     QPointF robotPos = ptOffset + _tag->pos();
-//     std::cout << "GetNoisePose:: Robot pos = " << robotPos.x() << ", " << robotPos.y() << "\n";
-//     double theta = rotation();
-    
-//     return State(robotPos.x(), robotPos.y(), theta);
-// }
-
-// State Robot::GetEstimatedPose()
-// {
-//     return estimatedPose_;
-// }
-
 State Robot::GetEstimatedPose()
 {
     double x = estimatedPose_->x();
@@ -403,11 +387,6 @@ State Robot::GetEstimatedPose()
     
     return State(x,y,theta);
 }
-
-// void Robot::SetEstimatedPose(State _pose)
-// {
-//     estimatedPose_ = _pose;
-// }
 
 void Robot::SetEstimatedPose(double x, double y, double theta)
 {
@@ -467,6 +446,7 @@ State* Robot::GetMeasurementAprilTag()
         if (TagIsInFOV(tag))
         {
             tag->SetColor(Qt::green);
+            // For now, just return the position based on the firs tag
             return GetNoisyPose(tag);
             //std::cout << "Noisy rotation = " << pose.theta << "\n";
             //SetEstimatedPose(pose);

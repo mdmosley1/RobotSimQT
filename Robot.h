@@ -76,6 +76,7 @@ private:
     Velocity GenerateRobotControl(State _state, Waypoint* _goal);
     void IncreaseLinearVelocity();
     void IncreaseAngularVelocity();
+    void ManageRobotTrail();
     void SetVelocity(Velocity _vel);
     void UpdatePosition();
     bool TagIsInFOV(AprilTag* _tag);
