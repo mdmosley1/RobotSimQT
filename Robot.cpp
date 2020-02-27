@@ -262,16 +262,6 @@ void Robot::advance(int step)
         
      // estimatedState = filter->EstimateState(visionMeasurement, imuMeasurement)
 
-
-     // if (aprilTagReady_)
-     // {
-     //     aprilTagReady_ = false;
-     // }
-     // else
-     // {
-    
-     // }
-
     std::cout << "Robot advance!" << "\n";
 
     // (i) get measurement (add noise to omega set in step iv)
@@ -283,6 +273,7 @@ void Robot::advance(int step)
 
     State state = GetRobotState();
     //State state = GetEstimatedPose();
+    if (cameraMeas != nullptr) SetEstimatedPose(*cameraMeas);
 
     // (iii) compute velocity from diff drive controller
     Velocity velocity(0,0);
@@ -448,8 +439,7 @@ State* Robot::GetMeasurementAprilTag()
             tag->SetColor(Qt::green);
             // For now, just return the position based on the firs tag
             return GetNoisyPose(tag);
-            //std::cout << "Noisy rotation = " << pose.theta << "\n";
-            //SetEstimatedPose(pose);
+            //std::cout << "Noisy rotation = " << pose.theta << "\n";            
         }
     }
     return nullptr;
