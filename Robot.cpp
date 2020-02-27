@@ -240,27 +240,9 @@ void Robot::DisplayTime()
 void Robot::advance(int step)
 {
     simTime_ += SIM_TIME_INCREMENT;
-
     DisplayTime();
-    
-
     if (!step)
         return;
-    
-// measurement = getMeasurement()
-// if (visionMeasurementReady && imuMeasurementReady)
-// {
-//     estimatedState = filter->EstimateState(visionMeasurement, imuMeasurement)
-// }
-// else if (visionMeasurementReady)
-// {
-//     estimatedState = filter->EstimateState(visionMeasurement)
-//         }
-// else if  (imuMeasurementReady)
-//     estimatedState = filter->EstimateState(imuMeasurement)
-//     else
-        
-     // estimatedState = filter->EstimateState(visionMeasurement, imuMeasurement)
 
     std::cout << "Robot advance!" << "\n";
 
@@ -277,7 +259,6 @@ void Robot::advance(int step)
 
     // (iii) compute velocity from diff drive controller
     Velocity velocity(0,0);
-    
     if (!goals_.empty())
     {
         Waypoint* wayPt = goals_.front();
