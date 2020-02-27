@@ -150,9 +150,10 @@ void Robot::AddGoalToCompleted(Waypoint* _goal)
 
 Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
 {
+    // gains 
     double kp = 20;
     double ka = 5;
-    double kb = 0;    
+    double kb = 0;
 
     double deltaX = _goal->x() - _state.x;
     double deltaY = _goal->y() - _state.y;
@@ -177,7 +178,7 @@ Velocity Robot::GenerateRobotControl(State _state, Waypoint* _goal)
     else if (alpha < -M_PI)
         alpha += 2 * M_PI;
 
-    double beta = -_state.theta - alpha; // desired theta when robot reaches goal (I think)
+    double beta = -_state.theta - alpha; // desired theta when robot reaches goal
     double angularVelocity = ka * alpha + kb * beta;
     double linearVelocity = kp * rho - std::fabs(alpha)*20.0; // if alpha is high, then need to reduce the linear velocity
 
@@ -295,8 +296,8 @@ void Robot::ManageRobotTrail()
 void Robot::CommandRobotVelocity(Velocity _vel)
 {
     // add noise to velocity to model the process noise
-    _vel.linear += GetRandN(0.0, processNoiseLinear_);
-    _vel.angular += GetRandN(0.0, processNoiseAngular_);
+    //_vel.linear += GetRandN(0.0, processNoiseLinear_);
+    //_vel.angular += GetRandN(0.0, processNoiseAngular_);
 
     SetVelocity(_vel);
 }

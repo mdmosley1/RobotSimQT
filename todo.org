@@ -42,7 +42,6 @@
   - [X] set position and rotation directly using SetPos() and SetRotation()
 * DONE display simtime at top of window
   CLOSED: [2020-02-26 Wed 19:29]
-* TODO ensure that window does not get too large for display
 * TODO load settings using QTSettings instead of yaml
 * TODO use simulation time like in python project
   - this would be useful for pausing or speeding up the simulation
@@ -50,9 +49,6 @@
     zero and increments every time the advance is called
   - [ ] global simulation time is frame number * dt, where dt = 1/LOOP_RATE
   - [ ] Display the simulation time at the top of the window
-* TODO read imu like in python project. 
-  - no asynchronous callbacks; just check to see if enough time has passed
-* TODO do same with camera read
 * TODO adjust noise to be centered at zero
 * TODO add step where the state is updated based on IMU
 * TODO if tag is facing away do not detect
