@@ -40,6 +40,9 @@
   - [X] make it a member of Robot class
   - [X] paint method should be same as robot but without FOV. And Black and white
   - [X] set position and rotation directly using SetPos() and SetRotation()
+* TODO add octave code to this git repo
+* TODO get rid of camera estimation and just use simple 2d point measurement with a lot of noise
+* TODO copy simple x,y point estimation kalman filter from octave code to qt project
 * TODO load settings using QTSettings instead of yaml
 * TODO use simulation time like in python project
   - this would be useful for pausing or speeding up the simulation
