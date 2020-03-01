@@ -326,17 +326,12 @@ QPointF TrackKalman(QPointF meas)
     MatrixXf z(2,1);
     z << meas.x(), meas.y();               // the x,y position measurement
 
-    Vector4f xp = A*xh;                  // predicted state
-    Matrix4f Pp = A*P*A.transpose() + Q;            // updated covariance
     Vector4f xp = A*xh;                    // predicted state
     Matrix4f Pp = A*P*A.transpose() + Q;   // prediction of the error covariance
     Matrix2f tmp = H*Pp*H.transpose() + R;
     MatrixXf K(4,2);
-    K = Pp*H.transpose()*tmp.inverse(); // compute the kalman gain
     K = Pp*H.transpose()*tmp.inverse();    // compute the kalman gain
 
-    xh = xp + K*(z - H*xp);     // combination of prediction and measurement
-    P = Pp - K*H*Pp;
     xh = xp + K*(z - H*xp);                // combination of prediction and measurement
     P = Pp - K*H*Pp;                       // estimate the error covariance
 
