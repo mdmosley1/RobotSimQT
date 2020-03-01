@@ -18,6 +18,8 @@ public:
 
     Robot * robot_;
 
+    QTimer* graphicsTimer_;
+
 public slots:
         void realtimeDataSlot();
 };

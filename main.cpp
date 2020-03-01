@@ -48,7 +48,7 @@ int main(int argc, char **argv)
                   y_bound_max/2);
     robot->setRotation(0);
 
-    int offset = 100;
+    // int offset = 100;
     // AprilTag* tag1 = new AprilTag(x_bound_min + offset,
     //                               y_bound_min + offset, 0);
     // AprilTag* tag2 = new AprilTag(x_bound_max - offset,
@@ -106,6 +106,10 @@ int main(int argc, char **argv)
     QTimer graphicsTimer;
     QObject::connect(&graphicsTimer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
     graphicsTimer.start(1/LOOP_RATE*1000);
+
+    // CustomView needs to own pointer to graphics timer so it can
+    // pause the animation.
+    view.graphicsTimer_ = &graphicsTimer;
 
     std::cout << "starting program" << "\n";
 

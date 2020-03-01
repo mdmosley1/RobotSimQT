@@ -14,12 +14,21 @@
 
 CustomView::CustomView(Robot* _robot): robot_(_robot)
 {
-    
+
 }
 
 void CustomView::keyPressEvent(QKeyEvent *event)
 {
-    std::cout << "keypress!" << "\n";
+    if (graphicsTimer_->isActive())
+    {
+        std::cout << "Pause!" << "\n";
+        graphicsTimer_->stop();
+    }
+    else
+    {
+        std::cout << "Resume!" << "\n";
+        graphicsTimer_->start();
+    }
 }
 
 
@@ -33,5 +42,3 @@ void CustomView::mousePressEvent(QMouseEvent *event)
     robot_->AddWaypoint(nextWaypoint);
     QGraphicsView::mousePressEvent(event);
 }
-
-
