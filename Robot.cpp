@@ -381,19 +381,19 @@ void Robot::advance(int step)
 
 void Robot::ManageRobotTrail()
 {
+    static std::queue<QGraphicsRectItem*> trailPoints;
     QGraphicsRectItem* trailPoint = new QGraphicsRectItem();
     QPointF point = mapToScene(-30, 0);
     trailPoint->setRect(point.x(), point.y(), 2, 2);
     trailPoint->setBrush(Qt::green);
     //add the item to the scene
     scene()->addItem(trailPoint);
-    // TODO: make trailPoints static
-    trailPoints_.push(trailPoint);
+    trailPoints.push(trailPoint);
     const size_t NUM_POINTS_TO_KEEP = 100;
-    while (trailPoints_.size() > NUM_POINTS_TO_KEEP)
+    while (trailPoints.size() > NUM_POINTS_TO_KEEP)
     {
-        auto point = trailPoints_.front();
-        trailPoints_.pop();
+        auto point = trailPoints.front();
+        trailPoints.pop();
         scene()->removeItem(point);
     }
 }

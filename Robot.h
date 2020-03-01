@@ -112,7 +112,7 @@ private:
 
     std::queue<Waypoint*> goals_;
     std::queue<Waypoint*> goalsCompleted_;
-    std::queue<QGraphicsRectItem*> trailPoints_;
+    
 
     std::vector<AprilTag*> aprilTags_;
 
