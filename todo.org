@@ -42,6 +42,11 @@
   - [X] set position and rotation directly using SetPos() and SetRotation()
 * DONE display simtime at top of window
   CLOSED: [2020-02-26 Wed 19:29]
+* TODO create latex doc with equations
+  - creaete a document with all the equations I need
+  - standard unicycle model state equation
+  - kalman filter equations
+  - differential drive controller
 * TODO load settings using QTSettings instead of yaml
 * TODO use simulation time like in python project
   - this would be useful for pausing or speeding up the simulation
