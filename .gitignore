@@ -2,3 +2,16 @@
 Makefile
 moc*
 collidingmice
+
+.DS_Store
+
+*.stash
+
+CMakeLists.txt
+
+collidingmice.app/Contents/Info.plist
+
+collidingmice.app/Contents/PkgInfo
+
+collidingmice.app/Contents/Resources/empty.lproj
+
