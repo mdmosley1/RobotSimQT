@@ -92,3 +92,9 @@ QPointF KalmanFilter::Filter(QPointF meas)
     QPointF estimatedPosition(xh[0], xh[2]);
     return estimatedPosition;
 }
+
+double KalmanFilter::GetErrorCovarianceNorm() const
+{
+    return P.norm();
+}
+

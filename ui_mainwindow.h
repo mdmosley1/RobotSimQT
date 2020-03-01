@@ -29,6 +29,7 @@ public:
     QVBoxLayout *verticalLayout;
     QCustomPlot *customPlotPos;
     QCustomPlot *customPlotVel;
+    QCustomPlot *customPlotCovar;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -44,11 +45,14 @@ public:
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         customPlotPos = new QCustomPlot(centralWidget);
         customPlotVel = new QCustomPlot(centralWidget);
+        customPlotCovar = new QCustomPlot(centralWidget);
         customPlotPos->setObjectName(QStringLiteral("customPlotPos"));
         customPlotVel->setObjectName(QStringLiteral("customPlotVel"));
+        customPlotCovar->setObjectName(QStringLiteral("customPlotCovar"));
 
         verticalLayout->addWidget(customPlotPos);
         verticalLayout->addWidget(customPlotVel);
+        verticalLayout->addWidget(customPlotCovar);
 
         MainWindow->setCentralWidget(centralWidget);
         statusBar = new QStatusBar(MainWindow);

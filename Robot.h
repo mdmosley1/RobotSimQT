@@ -55,8 +55,9 @@ public:
     void SetEstimatedPose(State);
     void SetEstimatedPose(double,double,double);
 signals:
-    void PositionChanged(double xn, double yn);
-    void UpdateVelocity(double);
+    void UpdateErrorCovariance(double covariance, double simTime);
+    void PositionChanged(double xn, double yn, double simTime);
+    void UpdateVelocity(double vel, double simTime);
 public slots:
     void advance(int step) override;
 private:

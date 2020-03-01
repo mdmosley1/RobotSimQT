@@ -8,6 +8,7 @@ public:
     void Init();
     QPointF Filter(QPointF meas);
     std::vector<QPointF> PredictTrajectory(int n, int skip);
+    double GetErrorCovarianceNorm() const;
 
 private:
     Eigen::Vector4d Predict(Eigen::Vector4d x);

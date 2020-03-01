@@ -21,13 +21,13 @@ public:
   
   void setupPosPlot(QCustomPlot *customPlot, Robot* _robotPtr);
   void setupVelPlot(QCustomPlot *customPlot, Robot* _robotPtr);
+  void setupCovarPlot(QCustomPlot *customPlot, Robot* _robotPtr);
   
 private slots:
-    //void realtimeDataSlot();
-    void PlotPosition(double x, double y);
-    void PlotVelocity(double);
-
-  
+    void PlotPosition(double x, double y, double);
+    void PlotVelocity(double, double);
+    void PlotCovariance(double, double);
+    //void PlotCovariance(double);
 private:
   Ui::MainWindow *ui;
   QString demoName;

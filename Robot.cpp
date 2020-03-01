@@ -327,6 +327,8 @@ void Robot::advance(int step)
     // visualize the estimated robot position from gps measurements
     VisualizeEstimatedPosition(estimatedPosition);
 
+    emit UpdateErrorCovariance(KalmanFilter_.GetErrorCovarianceNorm(), simTime_);
+
     // predict the next n states using system model
     int numberOfPredictions = 20; int statesToSkip = 5;
     std::vector<QPointF> traj = KalmanFilter_.PredictTrajectory(numberOfPredictions,
@@ -589,6 +591,6 @@ void Robot::UpdatePosition()
     // std::cout << "PositionY= " << y() << "\n";
     setPos(xn, yn);
     setRotation(theta*180/M_PI);
-    emit PositionChanged(xn, yn);
-    emit UpdateVelocity(vel_.linear);
+    emit PositionChanged(xn, yn, simTime_);
+    emit UpdateVelocity(vel_.linear, simTime_);
 }

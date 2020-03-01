@@ -17,6 +17,7 @@ MainWindow::MainWindow(Robot* _robotPtr, QWidget *parent) :
 
   setupPosPlot(ui->customPlotPos, _robotPtr);
   setupVelPlot(ui->customPlotVel, _robotPtr);
+  setupCovarPlot(ui->customPlotCovar, _robotPtr);
 }
 
 MainWindow::~MainWindow()
@@ -44,8 +45,8 @@ void MainWindow::setupPosPlot(QCustomPlot *customPlotPos, Robot* _robotPtr)
   
   // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
   //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
-  connect(_robotPtr, SIGNAL(PositionChanged(double, double)),
-          this,      SLOT(PlotPosition(double, double)));
+  connect(_robotPtr, SIGNAL(PositionChanged(double, double, double)),
+          this,      SLOT(PlotPosition(double, double, double)));
   //dataTimer.start(0); // Interval 0 means to refresh as fast as possible
 }
 
@@ -67,18 +68,42 @@ void MainWindow::setupVelPlot(QCustomPlot *customPlotVel, Robot* _robotPtr)
   
   // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
   //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
-  connect(_robotPtr, SIGNAL(UpdateVelocity(double)),
-          this,      SLOT(PlotVelocity(double)));
+  connect(_robotPtr, SIGNAL(UpdateVelocity(double, double)),
+          this,      SLOT(PlotVelocity(double,double)));
   //dataTimer.start(0); // Interval 0 means to refresh as fast as possible
+}
+
+void MainWindow::setupCovarPlot(QCustomPlot *customPlotCovar, Robot* _robotPtr)
+{
+  demoName = "Real Time Data Demo";
+  customPlotCovar->addGraph(); // blue line
+  customPlotCovar->graph(0)->setPen(QPen(QColor(40, 110, 255)));
+
+  QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
+  timeTicker->setTimeFormat("%h:%m:%s");
+  customPlotCovar->xAxis->setTicker(timeTicker);
+  customPlotCovar->axisRect()->setupFullAxesBox();
+  customPlotCovar->yAxis->setRange(0, 1000);
+  
+  // make left and bottom axes transfer their ranges to right and top axes:
+  connect(customPlotCovar->xAxis,
+          SIGNAL(rangeChanged(QCPRange)),
+          customPlotCovar->xAxis2,
+          SLOT(setRange(QCPRange)));
+  connect(customPlotCovar->yAxis,
+          SIGNAL(rangeChanged(QCPRange)),
+          customPlotCovar->yAxis2,
+          SLOT(setRange(QCPRange)) );
+  
+  connect(_robotPtr, SIGNAL(UpdateErrorCovariance(double, double)),
+           this,      SLOT( PlotCovariance(double, double)) );
 }
 
 
 
-void MainWindow::PlotPosition(double _x, double _y)
+void MainWindow::PlotPosition(double _x, double _y, double _simTime)
 {
-  static QTime time(QTime::currentTime());
-  // calculate two new data points:
-  double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+  double key = _simTime; // time elapsed since start of demo, in seconds
   static double lastPointKey = 0;
   if (key-lastPointKey > 0.002) // at most add point every 2 ms
   {
@@ -93,29 +118,11 @@ void MainWindow::PlotPosition(double _x, double _y)
   // make key axis range scroll with the data (at a constant range size of 8):
   ui->customPlotPos->xAxis->setRange(key, 8, Qt::AlignRight);
   ui->customPlotPos->replot();
-  
-  // calculate frames per second:
-  static double lastFpsKey;
-  static int frameCount;
-  ++frameCount;
-  if (key-lastFpsKey > 2) // average fps over 2 seconds
-  {
-    ui->statusBar->showMessage(
-          QString("%1 FPS, Total Data points: %2")
-          .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
-          .arg(ui->customPlotPos->graph(0)->data()->size()
-               +ui->customPlotPos->graph(1)->data()->size())
-          , 0);
-    lastFpsKey = key;
-    frameCount = 0;
-  }
 }
 
-void MainWindow::PlotVelocity(double _velocity)
+void MainWindow::PlotVelocity(double _velocity, double _simTime)
 {
-  static QTime time(QTime::currentTime());
-  // calculate two new data points:
-  double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+  double key = _simTime; // time elapsed since start of demo, in seconds
   static double lastPointKey = 0;
   if (key-lastPointKey > 0.002) // at most add point every 2 ms
   {
@@ -128,19 +135,21 @@ void MainWindow::PlotVelocity(double _velocity)
   // make key axis range scroll with the data (at a constant range size of 8):
   ui->customPlotVel->xAxis->setRange(key, 8, Qt::AlignRight);
   ui->customPlotVel->replot();
-  
-  // calculate frames per second:
-  static double lastFpsKey;
-  static int frameCount;
-  ++frameCount;
-  if (key-lastFpsKey > 2) // average fps over 2 seconds
+}
+
+void MainWindow::PlotCovariance(double _covariance, double _simTime)
+{
+  double key = _simTime; // time elapsed since start of demo, in seconds
+  static double lastPointKey = 0;
+  if (key-lastPointKey > 0.002) // at most add point every 2 ms
   {
-    ui->statusBar->showMessage(
-          QString("%1 FPS, Total Data points: %2")
-          .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
-          .arg(ui->customPlotVel->graph(0)->data()->size())
-          , 0);
-    lastFpsKey = key;
-    frameCount = 0;
+    // add data to lines:
+    ui->customPlotCovar->graph(0)->addData(key, _covariance);
+    // rescale value (vertical) axis to fit the current data:
+    ui->customPlotCovar->graph(0)->rescaleValueAxis();
+    lastPointKey = key;
   }
+  // make key axis range scroll with the data (at a constant range size of 8):
+  ui->customPlotCovar->xAxis->setRange(key, 8, Qt::AlignRight);
+  ui->customPlotCovar->replot();
 }
