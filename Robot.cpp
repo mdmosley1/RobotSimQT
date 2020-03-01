@@ -306,14 +306,19 @@ QPointF TrackKalman(QPointF meas)
         H << 1,  0,  0,  0,
             0,  0,  1,  0;
 
+        // State transition noise covariance matrix. Lower values
+        // result in smoother estimate
         Q.setIdentity();
         Q *= 0.01;
 
+        // Measurement noise covariance matrix. Higher values result
+        // in smoother estimate
         R << 50,  0,
             0, 50;
 
         xh << 0, 0, 0, 0; // the initial state estimate
 
+        // set the initial estimate of error covariance (start with high error)
         P.setIdentity();
         P *= 100;
     }
@@ -323,12 +328,17 @@ QPointF TrackKalman(QPointF meas)
 
     Vector4f xp = A*xh;                  // predicted state
     Matrix4f Pp = A*P*A.transpose() + Q;            // updated covariance
+    Vector4f xp = A*xh;                    // predicted state
+    Matrix4f Pp = A*P*A.transpose() + Q;   // prediction of the error covariance
     Matrix2f tmp = H*Pp*H.transpose() + R;
     MatrixXf K(4,2);
     K = Pp*H.transpose()*tmp.inverse(); // compute the kalman gain
+    K = Pp*H.transpose()*tmp.inverse();    // compute the kalman gain
 
     xh = xp + K*(z - H*xp);     // combination of prediction and measurement
     P = Pp - K*H*Pp;
+    xh = xp + K*(z - H*xp);                // combination of prediction and measurement
+    P = Pp - K*H*Pp;                       // estimate the error covariance
 
     // return the state estimate
     QPointF estimatedPosition(xh[0], xh[2]);
