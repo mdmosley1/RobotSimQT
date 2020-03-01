@@ -242,7 +242,7 @@ void Robot::DisplayTime()
 
 QPointF Robot::GetGPSMeasurement()
 {
-    double variance = 16.0;
+    double variance = 5.0;
     QPointF noise(GetRandN(0,variance), GetRandN(0,variance));
     return this->pos() + noise;
 }
@@ -275,8 +275,38 @@ void Robot::VisualizeEstimatedPosition(QPointF pos)
     p.setBrush(Qt::green);
 }
 
+void Robot::VisualizeTrajectory(std::vector<QPointF> traj)
+{
+    //QGraphicsEllipseItem* posGPS = new QGraphicsEllipseItem();
+    int numPredictions = traj.size();
+    static std::vector<QGraphicsEllipseItem> ps(numPredictions);
+    static bool firstRun = true;
+
+    // add all the graphics items to the scene the first time
+    if (firstRun)
+    {
+        firstRun = false;
+        for (int i = 0; i < numPredictions; ++i)
+        {
+            scene()->addItem(&ps[i]);
+        }
+    }
+
+    // draw each predition as an ellipse
+    int alpha = 255;
+    for (int i = 0; i < numPredictions; ++i)
+    {
+        auto& g = ps[i];
+        auto& pos = traj[i];
+        g.setRect(pos.x(), pos.y(), 10, 10);
+        QColor c = QColor(255,0,255, alpha);
+        g.setBrush(c);
+        alpha -= 10;
+    }
+}
+
 void Robot::advance(int step)
-{    
+{
     simTime_ += SIM_TIME_INCREMENT;
     DisplayTime();
     if (!step)
@@ -295,8 +325,12 @@ void Robot::advance(int step)
     // Apply kalman filter to gps measurements
     QPointF estimatedPosition = KalmanFilter_.Filter(gpsMeas);
     // visualize the estimated robot position from gps measurements
-    // just copy visualize gps measurement function and use different color.
     VisualizeEstimatedPosition(estimatedPosition);
+
+    // predict the next n states using system model
+    int numberOfPredictions = 20;
+    std::vector<QPointF> traj = KalmanFilter_.PredictTrajectory(numberOfPredictions);
+    VisualizeTrajectory(traj);
 
     State state = GetRobotState();
     //State state = GetEstimatedPose();

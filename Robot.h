@@ -83,6 +83,7 @@ private:
     bool TagIsInFOV(AprilTag* _tag);
     void VisualizeGPSMeasurment(QPointF pos);
     void VisualizeEstimatedPosition(QPointF pos);
+    void VisualizeTrajectory(std::vector<QPointF> traj);
 
     const double processNoiseLinear_ = 1.0;
     const double processNoiseAngular_ = 1.0;

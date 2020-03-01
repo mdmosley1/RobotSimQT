@@ -44,6 +44,31 @@ void KalmanFilter::Init()
     P *= 100;
 }
 
+// PredictTrajectory
+// Predict the next n states using the system model
+std::vector<QPointF> KalmanFilter::PredictTrajectory(int n)
+{
+    int skipFactor = 5;
+    std::vector<QPointF> trajectory;
+    Vector4d x = xh;
+    int idx = 0;
+    while (trajectory.size() < n)
+    {
+        idx++;
+        x = Predict(x);
+        if (idx % skipFactor == 0)
+        {
+            trajectory.push_back( QPointF(x(0), x(2)) );
+        }
+    }
+    return trajectory;
+}
+
+Vector4d KalmanFilter::Predict(Vector4d xh)
+{
+    return A*xh;
+}
+
 // TrackKalman()
 // Input: z - the measurement (x,y)
 // Output: xy - the estimated position (x,y)
@@ -52,7 +77,7 @@ QPointF KalmanFilter::Filter(QPointF meas)
     MatrixXd z(2,1);
     z << meas.x(), meas.y();               // the x,y position measurement
 
-    Vector4d xp = A*xh;                    // predicted state
+    Vector4d xp = Predict(xh);               // predict the next state
     Matrix4d Pp = A*P*A.transpose() + Q;   // prediction of the error covariance
     Matrix2d tmp = H*Pp*H.transpose() + R;
     MatrixXd K(4,2);

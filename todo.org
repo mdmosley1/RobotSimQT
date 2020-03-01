@@ -44,8 +44,8 @@
   CLOSED: [2020-02-26 Wed 19:29]
 * TODO copy simple x,y point estimation kalman filter from octave code to qt project
   - [ ] show predictions for the next second
-  - [ ] load params from ini file using qsettings
   - [ ] adjust kalman filter to just predict if measurement is not available
+* TODO plot error covariance norm in custom plot
 * TODO create latex doc with equations
   - creaete a document with all the equations I need
   - standard unicycle model state equation
