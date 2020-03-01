@@ -9,7 +9,8 @@
 #include <random>
 #include <Eigen/Dense>
 
-double SIM_TIME_INCREMENT = 1 / LOOP_RATE;
+const double LOOP_RATE_SIM = 30;
+const double SIM_TIME_INCREMENT = 1 / LOOP_RATE_SIM;
 
 Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 {
@@ -283,7 +284,7 @@ void Robot::VisualizeEstimatedPosition(QPointF pos)
 QPointF TrackKalman(QPointF meas)
 {
     using namespace Eigen;
-    static double dt = 1; // sample time
+    static double dt = LOOP_RATE_SIM; // sample time. TODO: calculate what this should be based on simulation time
     static bool firstRun = true;
 
     static Matrix4f A;
@@ -599,7 +600,7 @@ void Robot::AddWaypoint(Waypoint* _waypt)
 void Robot::UpdatePosition()
 {
     double theta = rotation() * M_PI/180.0;
-    double dt = 1/LOOP_RATE; // time step (seconds)
+    double dt = 1/LOOP_RATE_SIM; // time step (seconds)
     double xn = x() + dt*std::cos(theta)*vel_.linear;
     double yn = y() + dt*std::sin(theta)*vel_.linear;
     theta += dt*vel_.angular;
