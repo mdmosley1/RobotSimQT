@@ -7,6 +7,7 @@
 #include "constants.hh"
 #include "Waypoint.h"
 #include <random>
+#include <Eigen/Dense>
 
 double SIM_TIME_INCREMENT = 1 / LOOP_RATE;
 
@@ -86,7 +87,8 @@ void Robot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
 
 double GetRandN(double mean, double var)
 {
-    std::default_random_engine gen;
+    std::random_device r;
+    std::default_random_engine gen(r());
     std::normal_distribution<double> dist(mean, var);
     return dist(gen);
 }
@@ -238,6 +240,100 @@ void Robot::DisplayTime()
     scene()->addItem(timeTextItem_);
 }
 
+QPointF Robot::GetGPSMeasurement()
+{
+    //double variance = 15;
+    double variance = 10;
+    QPointF noise(GetRandN(0,variance), GetRandN(0,variance));
+    return this->pos() + noise;
+}
+
+void Robot::VisualizeGPSMeasurment(QPointF pos)
+{
+    //QGraphicsEllipseItem* posGPS = new QGraphicsEllipseItem();
+    static QGraphicsEllipseItem posGPS;
+    static bool firstRun = true;
+    if (firstRun)
+    {
+        firstRun = false;
+        scene()->addItem(&posGPS);
+    }
+    posGPS.setRect(pos.x(), pos.y(), 5, 5);
+    posGPS.setBrush(Qt::red);
+}
+
+void Robot::VisualizeEstimatedPosition(QPointF pos)
+{
+    //QGraphicsEllipseItem* posGPS = new QGraphicsEllipseItem();
+    static QGraphicsEllipseItem p;
+    static bool firstRun = true;
+    if (firstRun)
+    {
+        firstRun = false;
+        scene()->addItem(&p);
+    }
+    p.setRect(pos.x(), pos.y(), 10, 10);
+    p.setBrush(Qt::green);
+}
+
+
+// TrackKalman()
+// Input: z - the measurement (x,y)
+// Output: xy - the estimated position (x,y)
+QPointF TrackKalman(QPointF meas)
+{
+    using namespace Eigen;
+    static double dt = 1; // sample time
+    static bool firstRun = true;
+
+    static Matrix4f A;
+    static MatrixXf H(2,4);
+    static Matrix4f Q;
+    static Matrix2f R;
+    static Vector4f xh;
+    static Matrix4f P;
+
+    if (firstRun)
+    {
+        firstRun = false;
+        // The model is simple. Just have 1 derivative each for x,y
+        A << 1, dt,  0,   0,
+            0,  1,  0,   0,
+            0,  0,  1,  dt,
+            0,  0,  0,   1;
+        // The measurement matrix. We measure only x and y position
+        H << 1,  0,  0,  0,
+            0,  0,  1,  0;
+
+        Q.setIdentity();
+        Q *= 0.01;
+
+        R << 50,  0,
+            0, 50;
+
+        xh << 0, 0, 0, 0; // the initial state estimate
+
+        P.setIdentity();
+        P *= 100;
+    }
+
+    MatrixXf z(2,1);
+    z << meas.x(), meas.y();               // the x,y position measurement
+
+    Vector4f xp = A*xh;                  // predicted state
+    Matrix4f Pp = A*P*A.transpose() + Q;            // updated covariance
+    Matrix2f tmp = H*Pp*H.transpose() + R;
+    MatrixXf K(4,2);
+    K = Pp*H.transpose()*tmp.inverse(); // compute the kalman gain
+
+    xh = xp + K*(z - H*xp);     // combination of prediction and measurement
+    P = Pp - K*H*Pp;
+
+    // return the state estimate
+    QPointF estimatedPosition(xh[0], xh[2]);
+    return estimatedPosition;
+}
+
 void Robot::advance(int step)
 {
     simTime_ += SIM_TIME_INCREMENT;
@@ -246,17 +342,25 @@ void Robot::advance(int step)
         return;
 
     std::cout << "Robot advance!" << "\n";
-
     // (i) get measurement (add noise to omega set in step iv)
-    ImuMeasurement* imuMeas = nullptr;
-    State* cameraMeas = nullptr;
-    std::tie(imuMeas, cameraMeas) = GetMeasurements();
+    //ImuMeasurement* imuMeas = nullptr;
+    //State* cameraMeas = nullptr;
+    //std::tie(imuMeas, cameraMeas) = GetMeasurements();
+
     // (ii) estimate state using EKF
     // state = kalmanFilter_.EstimateState(imuMeas, cameraMeas);
+    QPointF gpsMeas = GetGPSMeasurement();
+    VisualizeGPSMeasurment(gpsMeas);
+
+    // Apply kalman filter to gps measurements
+    QPointF estimatedPosition = TrackKalman(gpsMeas);
+    // visualize the estimated robot position from gps measurements
+    // just copy visualize gps measurement function and use different color.
+    VisualizeEstimatedPosition(estimatedPosition);
 
     State state = GetRobotState();
     //State state = GetEstimatedPose();
-    if (cameraMeas != nullptr) SetEstimatedPose(*cameraMeas);
+    //if (cameraMeas != nullptr) SetEstimatedPose(*cameraMeas);
 
     // (iii) compute velocity from diff drive controller
     Velocity velocity(0,0);
@@ -283,6 +387,7 @@ void Robot::ManageRobotTrail()
     trailPoint->setBrush(Qt::green);
     //add the item to the scene
     scene()->addItem(trailPoint);
+    // TODO: make trailPoints static
     trailPoints_.push(trailPoint);
     const size_t NUM_POINTS_TO_KEEP = 100;
     while (trailPoints_.size() > NUM_POINTS_TO_KEEP)

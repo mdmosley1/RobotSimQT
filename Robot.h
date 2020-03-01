@@ -61,6 +61,7 @@ public slots:
     void advance(int step) override;
 private:
     void CommandRobotVelocity(Velocity _vel);
+    QPointF GetGPSMeasurement();
     State* GetMeasurementAprilTag();
     ImuMeasurement* GetMeasurementIMU();
     std::tuple<ImuMeasurement*, State*> GetMeasurements();
@@ -80,6 +81,8 @@ private:
     void SetVelocity(Velocity _vel);
     void UpdatePosition();
     bool TagIsInFOV(AprilTag* _tag);
+    void VisualizeGPSMeasurment(QPointF pos);
+    void VisualizeEstimatedPosition(QPointF pos);
 
     const double processNoiseLinear_ = 1.0;
     const double processNoiseAngular_ = 1.0;
