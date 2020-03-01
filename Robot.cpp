@@ -352,7 +352,6 @@ void Robot::advance(int step)
     if (!step)
         return;
 
-    std::cout << "Robot advance!" << "\n";
     // (i) get measurement (add noise to omega set in step iv)
     //ImuMeasurement* imuMeas = nullptr;
     //State* cameraMeas = nullptr;
