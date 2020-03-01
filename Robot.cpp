@@ -242,8 +242,7 @@ void Robot::DisplayTime()
 
 QPointF Robot::GetGPSMeasurement()
 {
-    //double variance = 15;
-    double variance = 10;
+    double variance = 16.0;
     QPointF noise(GetRandN(0,variance), GetRandN(0,variance));
     return this->pos() + noise;
 }
@@ -277,7 +276,7 @@ void Robot::VisualizeEstimatedPosition(QPointF pos)
 }
 
 void Robot::advance(int step)
-{
+{    
     simTime_ += SIM_TIME_INCREMENT;
     DisplayTime();
     if (!step)

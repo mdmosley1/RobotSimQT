@@ -7,19 +7,13 @@ x_bound_max: 1000
 y_bound_min: 0
 y_bound_max: 1000
 
-AprilTags:
-  - posx: 100
-    posy: 100
-    theta: 0
-  - posx: 900
-    posy: 100
-    theta: 90
-  - posx: 900
-    posy: 900
-    theta: 180
-  - posx: 100
-    posy: 900
-    theta: 270   
-    
-  
-  
+# measurement noise standard deviation. Higher values result in smoother estimate
+measStdDevX: 1.0
+measStdDevY: 1.0
+
+# process (state transition) noise standard deviation
+processStdDevX: 0.01
+processStdDevXdot: 0.01
+processStdDevY: 0.01
+processStdDevYdot: 0.01
+
