@@ -7,7 +7,7 @@ class KalmanFilter
 public:
     void Init();
     QPointF Filter(QPointF meas);
-    std::vector<QPointF> PredictTrajectory(int n);
+    std::vector<QPointF> PredictTrajectory(int n, int skip);
 
 private:
     Eigen::Vector4d Predict(Eigen::Vector4d x);

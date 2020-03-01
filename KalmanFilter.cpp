@@ -46,9 +46,11 @@ void KalmanFilter::Init()
 
 // PredictTrajectory
 // Predict the next n states using the system model
-std::vector<QPointF> KalmanFilter::PredictTrajectory(int n)
+// Inputs:
+//   n - number of states to predict into the future
+//   skipFactor - skip this many iterations between predictions
+std::vector<QPointF> KalmanFilter::PredictTrajectory(int n, int skipFactor)
 {
-    int skipFactor = 5;
     std::vector<QPointF> trajectory;
     Vector4d x = xh;
     int idx = 0;

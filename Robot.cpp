@@ -272,7 +272,7 @@ void Robot::VisualizeEstimatedPosition(QPointF pos)
         scene()->addItem(&p);
     }
     p.setRect(pos.x(), pos.y(), 10, 10);
-    p.setBrush(Qt::green);
+    p.setBrush(QColor(255,0,255));
 }
 
 void Robot::VisualizeTrajectory(std::vector<QPointF> traj)
@@ -298,7 +298,7 @@ void Robot::VisualizeTrajectory(std::vector<QPointF> traj)
     {
         auto& g = ps[i];
         auto& pos = traj[i];
-        g.setRect(pos.x(), pos.y(), 10, 10);
+        g.setRect(pos.x(), pos.y(), 5, 5);
         QColor c = QColor(255,0,255, alpha);
         g.setBrush(c);
         alpha -= 10;
@@ -328,8 +328,9 @@ void Robot::advance(int step)
     VisualizeEstimatedPosition(estimatedPosition);
 
     // predict the next n states using system model
-    int numberOfPredictions = 20;
-    std::vector<QPointF> traj = KalmanFilter_.PredictTrajectory(numberOfPredictions);
+    int numberOfPredictions = 20; int statesToSkip = 5;
+    std::vector<QPointF> traj = KalmanFilter_.PredictTrajectory(numberOfPredictions,
+                                                                statesToSkip);
     VisualizeTrajectory(traj);
 
     State state = GetRobotState();
