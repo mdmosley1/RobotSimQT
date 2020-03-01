@@ -49,22 +49,22 @@ int main(int argc, char **argv)
     robot->setRotation(0);
 
     int offset = 100;
-    AprilTag* tag1 = new AprilTag(x_bound_min + offset,
-                                  y_bound_min + offset, 0);
-    AprilTag* tag2 = new AprilTag(x_bound_max - offset,
-                                  y_bound_min + offset, 90);
-    AprilTag* tag3 = new AprilTag(x_bound_max - offset,
-                                  y_bound_max - offset,180);
-    AprilTag* tag4 = new AprilTag(x_bound_min + offset,
-                                  y_bound_max - offset,270);
-    scene.addItem(tag1);
-    scene.addItem(tag2);
-    scene.addItem(tag3);
-    scene.addItem(tag4);
-    robot->AddAprilTag(tag1);
-    robot->AddAprilTag(tag2);
-    robot->AddAprilTag(tag3);
-    robot->AddAprilTag(tag4);
+    // AprilTag* tag1 = new AprilTag(x_bound_min + offset,
+    //                               y_bound_min + offset, 0);
+    // AprilTag* tag2 = new AprilTag(x_bound_max - offset,
+    //                               y_bound_min + offset, 90);
+    // AprilTag* tag3 = new AprilTag(x_bound_max - offset,
+    //                               y_bound_max - offset,180);
+    // AprilTag* tag4 = new AprilTag(x_bound_min + offset,
+    //                               y_bound_max - offset,270);
+    // scene.addItem(tag1);
+    // scene.addItem(tag2);
+    // scene.addItem(tag3);
+    // scene.addItem(tag4);
+    // robot->AddAprilTag(tag1);
+    // robot->AddAprilTag(tag2);
+    // robot->AddAprilTag(tag3);
+    // robot->AddAprilTag(tag4);
 
     // {
     // QPolygonF wall;
