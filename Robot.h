@@ -7,7 +7,7 @@
 #include "Waypoint.h"
 #include "AprilTag.h"
 #include "EstimatedPose.h"
-
+#include "KalmanFilter.h"
 
 struct Point2f
 {
@@ -132,5 +132,7 @@ private:
     double simTime_ = 0.0;
 
     QGraphicsTextItem* timeTextItem_;
+
+    KalmanFilter KalmanFilter_;
 };
 #endif // ROBOT_H

@@ -7,10 +7,7 @@
 #include "constants.hh"
 #include "Waypoint.h"
 #include <random>
-#include <Eigen/Dense>
-
-const double LOOP_RATE_SIM = 30;
-const double SIM_TIME_INCREMENT = 1 / LOOP_RATE_SIM;
+#include "constants.hh"
 
 Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 {
@@ -28,6 +25,8 @@ Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
     noisyPose_ = State(0,0,0);
 
     timeTextItem_ = new QGraphicsTextItem;
+
+    KalmanFilter_.Init();
 }
 
 void Robot::AddMembersToScene()
@@ -277,69 +276,6 @@ void Robot::VisualizeEstimatedPosition(QPointF pos)
     p.setBrush(Qt::green);
 }
 
-
-// TrackKalman()
-// Input: z - the measurement (x,y)
-// Output: xy - the estimated position (x,y)
-QPointF TrackKalman(QPointF meas)
-{
-    using namespace Eigen;
-    static double dt = LOOP_RATE_SIM; // sample time. TODO: calculate what this should be based on simulation time
-    static bool firstRun = true;
-
-    static Matrix4f A;
-    static MatrixXf H(2,4);
-    static Matrix4f Q;
-    static Matrix2f R;
-    static Vector4f xh;
-    static Matrix4f P;
-
-    if (firstRun)
-    {
-        firstRun = false;
-        // The model is simple. Just have 1 derivative each for x,y
-        A << 1, dt,  0,   0,
-            0,  1,  0,   0,
-            0,  0,  1,  dt,
-            0,  0,  0,   1;
-        // The measurement matrix. We measure only x and y position
-        H << 1,  0,  0,  0,
-            0,  0,  1,  0;
-
-        // State transition noise covariance matrix. Lower values
-        // result in smoother estimate
-        Q.setIdentity();
-        Q *= 0.01;
-
-        // Measurement noise covariance matrix. Higher values result
-        // in smoother estimate
-        R << 50,  0,
-            0, 50;
-
-        xh << 0, 0, 0, 0; // the initial state estimate
-
-        // set the initial estimate of error covariance (start with high error)
-        P.setIdentity();
-        P *= 100;
-    }
-
-    MatrixXf z(2,1);
-    z << meas.x(), meas.y();               // the x,y position measurement
-
-    Vector4f xp = A*xh;                    // predicted state
-    Matrix4f Pp = A*P*A.transpose() + Q;   // prediction of the error covariance
-    Matrix2f tmp = H*Pp*H.transpose() + R;
-    MatrixXf K(4,2);
-    K = Pp*H.transpose()*tmp.inverse();    // compute the kalman gain
-
-    xh = xp + K*(z - H*xp);                // combination of prediction and measurement
-    P = Pp - K*H*Pp;                       // estimate the error covariance
-
-    // return the state estimate
-    QPointF estimatedPosition(xh[0], xh[2]);
-    return estimatedPosition;
-}
-
 void Robot::advance(int step)
 {
     simTime_ += SIM_TIME_INCREMENT;
@@ -358,7 +294,7 @@ void Robot::advance(int step)
     VisualizeGPSMeasurment(gpsMeas);
 
     // Apply kalman filter to gps measurements
-    QPointF estimatedPosition = TrackKalman(gpsMeas);
+    QPointF estimatedPosition = KalmanFilter_.Filter(gpsMeas);
     // visualize the estimated robot position from gps measurements
     // just copy visualize gps measurement function and use different color.
     VisualizeEstimatedPosition(estimatedPosition);

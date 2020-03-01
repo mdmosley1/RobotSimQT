@@ -11,7 +11,8 @@ HEADERS += \
         mainwindow.h\
         AprilTag.h\
         EstimatedPose.h\
-        logging.h
+        logging.h \
+        KalmanFilter.h
 SOURCES += \
 	main.cpp \
         mouse.cpp \
@@ -21,7 +22,8 @@ SOURCES += \
         mainwindow.cpp\
         AprilTag.cpp\
         EstimatedPose.cpp \
-        logging.cpp
+        logging.cpp \
+        KalmanFilter.cpp
 
 
 QT += core
