@@ -2,14 +2,14 @@
 
 #
 x_bound_min: 0
-x_bound_max: 1000
+x_bound_max: 800
 
 y_bound_min: 0
-y_bound_max: 1000
+y_bound_max: 800
 
 # measurement noise standard deviation. Higher values result in smoother estimate
-measStdDevX: 1.0
-measStdDevY: 1.0
+measStdDevX: 0.1
+measStdDevY: 0.1
 
 # process (state transition) noise standard deviation
 processStdDevX: 0.01

@@ -19,15 +19,18 @@ CustomView::CustomView(Robot* _robot): robot_(_robot)
 
 void CustomView::keyPressEvent(QKeyEvent *event)
 {
-    if (graphicsTimer_->isActive())
+    if ((event->key()==Qt::Key_Space))
     {
-        std::cout << "Pause!" << "\n";
-        graphicsTimer_->stop();
-    }
-    else
-    {
-        std::cout << "Resume!" << "\n";
-        graphicsTimer_->start();
+        if (graphicsTimer_->isActive())
+        {
+            std::cout << "Pause!" << "\n";
+            graphicsTimer_->stop();
+        }
+        else
+        {
+            std::cout << "Resume!" << "\n";
+            graphicsTimer_->start();
+        }
     }
 }
 

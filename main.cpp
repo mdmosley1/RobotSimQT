@@ -16,7 +16,7 @@
 #include "mainwindow.h"
 #include <QGraphicsPolygonItem>
 #include "EstimatedPose.h"
-//#include "ConfigurationYaml.h"
+#include "yaml-cpp/yaml.h"
 
 static const int MouseCount = 7;
 
@@ -24,14 +24,16 @@ int main(int argc, char **argv)
 {
     //ConfigurationYaml configYaml;
     //configYaml.Init("config.yaml");
-    
+
     QApplication app(argc, argv);
     QGraphicsScene scene;
-    int x_bound_min = 0;
-    int x_bound_max = 1000;
-    int y_bound_min = 0;
-    int y_bound_max = 600;
-    
+
+    YAML::Node config = YAML::LoadFile("config.yaml");
+    const int x_bound_min  = config["x_bound_min"].as<int>();
+    const int x_bound_max  = config["x_bound_max"].as<int>();
+    const int y_bound_min  = config["y_bound_min"].as<int>();
+    const int y_bound_max  = config["y_bound_max"].as<int>();
+
     scene.setSceneRect(x_bound_min, y_bound_min,
                        x_bound_max, y_bound_max);
 
@@ -43,7 +45,7 @@ int main(int argc, char **argv)
     view.setScene(&scene);
     scene.addItem(robot);
     robot->AddMembersToScene();
-    
+
     robot->setPos(x_bound_max/2,
                   y_bound_max/2);
     robot->setRotation(0);
