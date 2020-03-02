@@ -43,6 +43,32 @@ void CustomView::keyPressEvent(QKeyEvent *event)
         graphicsTimer_->start(1);
     }
 
+    // Speed up or slow down the simulation
+    if ( event->key()==Qt::Key_Up &&
+         graphicsTimer_->isActive())
+    {
+        std::cout << "Speeding up!" << "\n";
+        graphicsTimer_->setSingleShot(false);
+        int dt = graphicsTimer_->interval();
+        graphicsTimer_->start(dt*0.75);
+    }
+
+    if ( event->key()==Qt::Key_Down &&
+         graphicsTimer_->isActive())
+    {
+        std::cout << "Slowing down!" << "\n";
+        graphicsTimer_->setSingleShot(false);
+        int dt = graphicsTimer_->interval();
+        graphicsTimer_->start(dt*1.50);
+    }
+
+    // Quit
+    if ( event->key()==Qt::Key_Q)
+    {
+        std::cout << "User pressed Q so we are qutting!" << "\n";
+        exit(0);
+    }
+
     // Reset Kalman Filter
     if ( event->key()==Qt::Key_R)
     {
