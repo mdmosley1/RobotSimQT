@@ -37,7 +37,7 @@ void KalmanFilter::Init()
     R << pow(measStdDevX,2),  0,
         0, pow(measStdDevY,2);
 
-    xh << 0, 0, 0, 0; // the initial state estimate
+    xh << 10, 10, 10, 10; // the initial state estimate
 
     // set the initial estimate of error covariance (start with high error)
     P.setIdentity();

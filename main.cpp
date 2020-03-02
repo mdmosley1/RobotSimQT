@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     // start a timer to display graphics at 30 frames per second
     QTimer graphicsTimer;
     QObject::connect(&graphicsTimer, &QTimer::timeout, &scene, &QGraphicsScene::advance);
-    graphicsTimer.start(1/LOOP_RATE*1000);
+    // graphicsTimer.start(1/LOOP_RATE*1000);
 
     // CustomView needs to own pointer to graphics timer so it can
     // pause the animation.

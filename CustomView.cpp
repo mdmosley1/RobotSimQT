@@ -42,6 +42,13 @@ void CustomView::keyPressEvent(QKeyEvent *event)
         graphicsTimer_->setSingleShot(true);
         graphicsTimer_->start(1);
     }
+
+    // Reset Kalman Filter
+    if ( event->key()==Qt::Key_R)
+    {
+        std::cout << "Reset kalman filter!" << "\n";
+        robot_->ResetKalmanFilter();
+    }
 }
 
 

@@ -54,6 +54,7 @@ public:
     void SetEstimatedPose(EstimatedPose*);
     void SetEstimatedPose(State);
     void SetEstimatedPose(double,double,double);
+    void ResetKalmanFilter();
 signals:
     void UpdateErrorCovariance(double covariance, double simTime);
     void PositionChanged(double xn, double yn, double simTime);

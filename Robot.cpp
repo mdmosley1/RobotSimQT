@@ -594,3 +594,8 @@ void Robot::UpdatePosition()
     emit PositionChanged(xn, yn, simTime_);
     emit UpdateVelocity(vel_.linear, simTime_);
 }
+
+void Robot::ResetKalmanFilter()
+{
+    KalmanFilter_.Init();
+}
