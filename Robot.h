@@ -8,6 +8,7 @@
 #include "AprilTag.h"
 #include "EstimatedPose.h"
 #include "KalmanFilter.h"
+#include "GPSReceiver.h"
 
 struct Point2f
 {
@@ -55,6 +56,7 @@ public:
     void SetEstimatedPose(State);
     void SetEstimatedPose(double,double,double);
     void ResetKalmanFilter();
+    GPSReceiver GPS_;
 signals:
     void UpdateErrorCovariance(double covariance, double simTime);
     void PositionChanged(double xn, double yn, double simTime);

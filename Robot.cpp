@@ -6,8 +6,8 @@
 #include "qpainter.h"
 #include "constants.hh"
 #include "Waypoint.h"
-#include <random>
 #include "constants.hh"
+#include "GPSReceiver.h"
 
 Robot::Robot(): color_(std::rand() % 256, std::rand() % 256, std::rand() % 256)
 {
@@ -85,13 +85,6 @@ void Robot::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
     painter->drawPolygon(&pointsFOV_[0], 3);
 }
 
-double GetRandN(double mean, double var)
-{
-    std::random_device r;
-    std::default_random_engine gen(r());
-    std::normal_distribution<double> dist(mean, var);
-    return dist(gen);
-}
 
 void Robot::IncreaseLinearVelocity()
 {
@@ -240,12 +233,7 @@ void Robot::DisplayTime()
     scene()->addItem(timeTextItem_);
 }
 
-QPointF Robot::GetGPSMeasurement()
-{
-    double variance = 5.0;
-    QPointF noise(GetRandN(0,variance), GetRandN(0,variance));
-    return this->pos() + noise;
-}
+
 
 void Robot::VisualizeGPSMeasurment(QPointF pos)
 {
@@ -319,7 +307,7 @@ void Robot::advance(int step)
 
     // (ii) estimate state using EKF
     // state = kalmanFilter_.EstimateState(imuMeas, cameraMeas);
-    QPointF gpsMeas = GetGPSMeasurement();
+    QPointF gpsMeas = GPS_.GetGPSMeasurement(this->pos());
     VisualizeGPSMeasurment(gpsMeas);
 
     // Apply kalman filter to gps measurements

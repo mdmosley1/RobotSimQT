@@ -12,7 +12,8 @@ HEADERS += \
         AprilTag.h\
         EstimatedPose.h\
         logging.h \
-        KalmanFilter.h
+        KalmanFilter.h \
+        GPSReceiver.h
 SOURCES += \
 	main.cpp \
         mouse.cpp \
@@ -23,7 +24,8 @@ SOURCES += \
         AprilTag.cpp\
         EstimatedPose.cpp \
         logging.cpp \
-        KalmanFilter.cpp
+        KalmanFilter.cpp \
+        GPSReceiver.cpp
 
 
 QT += core

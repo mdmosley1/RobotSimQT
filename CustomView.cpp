@@ -45,7 +45,7 @@ void CustomView::keyPressEvent(QKeyEvent *event)
     }
 
     // Speed up or slow down the simulation
-    if ( event->key()==Qt::Key_Up &&
+    if ( event->key()==Qt::Key_Right &&
          graphicsTimer_->isActive())
     {
         std::cout << "Speeding up!" << "\n";
@@ -54,7 +54,7 @@ void CustomView::keyPressEvent(QKeyEvent *event)
         graphicsTimer_->start(loopDt_ms);
     }
 
-    if ( event->key()==Qt::Key_Down &&
+    if ( event->key()==Qt::Key_Left &&
          graphicsTimer_->isActive())
     {
         std::cout << "Slowing down!" << "\n";
@@ -75,6 +75,18 @@ void CustomView::keyPressEvent(QKeyEvent *event)
     {
         std::cout << "Reset kalman filter!" << "\n";
         robot_->ResetKalmanFilter();
+    }
+
+    // Increase/Decrease measurement noise
+    if ( event->key()==Qt::Key_Up)
+    {
+        std::cout << "Increasing measurement noise!" << "\n";
+        robot_->GPS_.IncreaseNoise();
+    }
+    if ( event->key()==Qt::Key_Down)
+    {
+        std::cout << "Decreasing measurement noise!" << "\n";
+        robot_->GPS_.DecreaseNoise();
     }
 }
 
