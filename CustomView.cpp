@@ -19,6 +19,7 @@ CustomView::CustomView(Robot* _robot): robot_(_robot)
 
 void CustomView::keyPressEvent(QKeyEvent *event)
 {
+    static double loopDt_ms = 1/LOOP_RATE*1000;
     // toggle pause state
     if ((event->key()==Qt::Key_Space))
     {
@@ -31,7 +32,7 @@ void CustomView::keyPressEvent(QKeyEvent *event)
         {
             std::cout << "Resume!" << "\n";
             graphicsTimer_->setSingleShot(false);
-            graphicsTimer_->start(1/LOOP_RATE*1000);
+            graphicsTimer_->start(loopDt_ms);
         }
     }
 
@@ -49,8 +50,8 @@ void CustomView::keyPressEvent(QKeyEvent *event)
     {
         std::cout << "Speeding up!" << "\n";
         graphicsTimer_->setSingleShot(false);
-        int dt = graphicsTimer_->interval();
-        graphicsTimer_->start(dt*0.75);
+        loopDt_ms *= 0.75;
+        graphicsTimer_->start(loopDt_ms);
     }
 
     if ( event->key()==Qt::Key_Down &&
@@ -58,8 +59,8 @@ void CustomView::keyPressEvent(QKeyEvent *event)
     {
         std::cout << "Slowing down!" << "\n";
         graphicsTimer_->setSingleShot(false);
-        int dt = graphicsTimer_->interval();
-        graphicsTimer_->start(dt*1.50);
+        loopDt_ms *= 1.50;
+        graphicsTimer_->start(loopDt_ms);
     }
 
     // Quit
